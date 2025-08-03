@@ -4,8 +4,8 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "python web_server.py",
-    "healthcheckPath": "/api/categorias",
+    "startCommand": "python web_server_simple.py",
+    "healthcheckPath": "/test",
     "healthcheckTimeout": 100,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
