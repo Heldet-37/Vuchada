@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, session, send_from_directory
+from flask_cors import CORS
 import sqlite3
 import hashlib
 from datetime import datetime, time
@@ -6,6 +7,7 @@ import os
 from database import init_db
 
 app = Flask(__name__, static_folder='static')
+CORS(app)  # Permitir CORS para todas as origens
 app.secret_key = 'pdv_restaurant_secret_key_2024'
 
 # Inicializar banco de dados
@@ -171,6 +173,56 @@ def login():
 @app.route('/api/restaurant-status')
 def get_restaurant_status():
     return jsonify({'status': 'aberto', 'message': 'Aberto para pedidos', 'is_open': True})
+
+@app.route('/api/user-info')
+def get_user_info():
+    if 'user_id' not in session:
+        return jsonify({'success': False})
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('SELECT name FROM users WHERE id = ?', (session['user_id'],))
+    user = cursor.fetchone()
+    conn.close()
+    
+    if user:
+        return jsonify({'success': True, 'name': user['name']})
+    else:
+        return jsonify({'success': False})
+
+@app.route('/api/pedidos')
+def get_pedidos():
+    if 'user_id' not in session:
+        return jsonify([])
+    
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute('''
+        SELECT o.id, o.status, o.total_amount, o.created_at,
+               t.number as table_number, t.capacity,
+               CONCAT('Mesa ', t.number) as table_name
+        FROM orders o
+        LEFT JOIN tables t ON o.table_id = t.id
+        ORDER BY o.created_at DESC
+    ''')
+    
+    pedidos = []
+    for row in cursor.fetchall():
+        pedidos.append({
+            'id': row['id'],
+            'status': row['status'],
+            'total': row['total_amount'],
+            'total_formatted': format_metical(row['total_amount']),
+            'created_at': row['created_at'],
+            'table_name': row['table_name'],
+            'table_number': row['table_number'],
+            'capacity': row['capacity']
+        })
+    
+    conn.close()
+    return jsonify(pedidos)
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
