@@ -79,6 +79,11 @@
             flex-direction: column;
             cursor: pointer;
             padding: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .hamburger:hover {
+            transform: scale(1.1);
         }
 
         .hamburger span {
@@ -86,20 +91,24 @@
             height: 3px;
             background: #FF8C00;
             margin: 3px 0;
-            transition: 0.3s;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             border-radius: 2px;
+            transform-origin: center;
         }
 
         .hamburger.active span:nth-child(1) {
             transform: rotate(-45deg) translate(-5px, 6px);
+            background: #D2691E;
         }
 
         .hamburger.active span:nth-child(2) {
             opacity: 0;
+            transform: scaleX(0);
         }
 
         .hamburger.active span:nth-child(3) {
             transform: rotate(45deg) translate(-5px, -6px);
+            background: #D2691E;
         }
 
         /* Mobile Menu */
@@ -114,12 +123,14 @@
             padding: 2rem;
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             transform: translateY(-100%);
-            transition: transform 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             z-index: 999;
+            opacity: 0;
         }
 
         .mobile-menu.active {
             transform: translateY(0);
+            opacity: 1;
         }
 
         .mobile-menu a {
@@ -130,11 +141,25 @@
             font-weight: 600;
             border-bottom: 1px solid #eee;
             transition: all 0.3s ease;
+            transform: translateX(-20px);
+            opacity: 0;
         }
+
+        .mobile-menu.active a {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .mobile-menu a:nth-child(1) { transition-delay: 0.1s; }
+        .mobile-menu a:nth-child(2) { transition-delay: 0.2s; }
+        .mobile-menu a:nth-child(3) { transition-delay: 0.3s; }
+        .mobile-menu a:nth-child(4) { transition-delay: 0.4s; }
 
         .mobile-menu a:hover {
             color: #D2691E;
             padding-left: 1rem;
+            background: rgba(255, 140, 0, 0.1);
+            border-radius: 8px;
         }
 
         /* Restaurant Status */
@@ -442,7 +467,7 @@
     <!-- Hero Section with Carousel -->
     <section class="hero">
         <div class="carousel">
-            <div class="carousel-slide active" style="background-image: url('https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80')">
+            <div class="carousel-slide active" style="background-image: url('https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')">
                 <div class="carousel-content">
                     <h1>Vuchada</h1>
                     <p>Descubra sabores únicos e experiências gastronômicas inesquecíveis</p>
@@ -452,7 +477,7 @@
                     </div>
                 </div>
             </div>
-            <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')">
+            <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1504674900240-9a9049b7d8ce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')">
                 <div class="carousel-content">
                     <h1>Cardápio Digital</h1>
                     <p>Navegue pelo nosso cardápio interativo e faça pedidos diretamente do seu dispositivo</p>
@@ -462,7 +487,7 @@
                     </div>
                 </div>
             </div>
-            <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1504674900240-9a9049b7d8ce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')">
+            <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')">
                 <div class="carousel-content">
                     <h1>Qualidade Garantida</h1>
                     <p>Ingredientes frescos e preparação artesanal para uma experiência gastronômica única</p>
@@ -515,12 +540,19 @@
         const slides = document.querySelectorAll('.carousel-slide');
         const dots = document.querySelectorAll('.carousel-dot');
         const totalSlides = slides.length;
+        let carouselInterval;
 
         function showSlide(index) {
-            slides.forEach(slide => slide.classList.remove('active'));
+            // Remove active class from all slides and dots
+            slides.forEach(slide => {
+                slide.classList.remove('active');
+                slide.style.opacity = '0';
+            });
             dots.forEach(dot => dot.classList.remove('active'));
             
+            // Add active class to current slide and dot
             slides[index].classList.add('active');
+            slides[index].style.opacity = '1';
             dots[index].classList.add('active');
         }
 
@@ -529,16 +561,33 @@
             showSlide(currentSlide);
         }
 
-        // Auto-advance carousel
-        setInterval(nextSlide, 5000);
+        function startCarousel() {
+            carouselInterval = setInterval(nextSlide, 5000);
+        }
+
+        function stopCarousel() {
+            clearInterval(carouselInterval);
+        }
+
+        // Initialize carousel
+        showSlide(0);
+        startCarousel();
 
         // Dot navigation
         dots.forEach((dot, index) => {
             dot.addEventListener('click', () => {
                 currentSlide = index;
                 showSlide(currentSlide);
+                // Restart carousel after manual navigation
+                stopCarousel();
+                startCarousel();
             });
         });
+
+        // Pause carousel on hover
+        const carousel = document.querySelector('.carousel');
+        carousel.addEventListener('mouseenter', stopCarousel);
+        carousel.addEventListener('mouseleave', startCarousel);
 
         // Mobile menu functionality
         const hamburger = document.getElementById('hamburger');
