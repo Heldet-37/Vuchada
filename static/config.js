@@ -1,21 +1,15 @@
 // Configuração da API
 const API_CONFIG = {
-    // URL do backend (mude para sua URL real)
     BASE_URL: 'https://web-production-5220.up.railway.app',
-    
-    // URLs das APIs
-    CATEGORIAS: '/api/categorias',
-    PRODUTOS: '/api/produtos',
-    PEDIDOS: '/api/pedidos',
-    MESAS: '/api/mesas',
-    LOGIN: '/api/login',
-    USER_INFO: '/api/user-info',
-    FAZER_PEDIDO: '/api/fazer_pedido',
-    RESTAURANT_STATUS: '/api/restaurant-status',
-    
-    // Função para construir URLs completas
-    getUrl: function(endpoint) {
-        return this.BASE_URL + endpoint;
+    ENDPOINTS: {
+        CATEGORIAS: '/api/categorias',
+        PRODUTOS: '/api/produtos',
+        MESAS: '/api/mesas',
+        PEDIDOS: '/api/fazer_pedido',
+        LOGIN: '/api/login',
+        STATUS: '/api/restaurant-status',
+        USER_INFO: '/api/user-info',
+        PEDIDOS_LIST: '/api/pedidos'
     }
 };
 
