@@ -426,9 +426,15 @@
             }
 
             .restaurant-status {
-                position: static;
-                margin: 1rem auto;
-                width: fit-content;
+                position: fixed;
+                top: 100px;
+                right: 10px;
+                left: 10px;
+                margin: 0;
+                width: auto;
+                justify-content: center;
+                font-size: 0.9rem;
+                padding: 0.4rem 0.8rem;
             }
         }
     </style>
@@ -465,7 +471,7 @@
     <!-- Hero Section with Carousel -->
     <section class="hero">
         <div class="carousel">
-            <div class="carousel-slide active" style="background-image: url('https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')">
+            <div class="carousel-slide active" style="background-image: url('https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=1200&h=800&fit=crop')">
                 <div class="carousel-content">
                     <h1>Vuchada</h1>
                     <p>Descubra sabores únicos e experiências gastronômicas inesquecíveis</p>
@@ -475,7 +481,7 @@
                     </div>
                 </div>
             </div>
-            <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1504674900240-9a9049b7d8ce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')">
+            <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1504674900240-9a9049b7d8ce?w=1200&h=800&fit=crop')">
                 <div class="carousel-content">
                     <h1>Cardápio Digital</h1>
                     <p>Navegue pelo nosso cardápio interativo e faça pedidos diretamente do seu dispositivo</p>
@@ -485,7 +491,7 @@
                     </div>
                 </div>
             </div>
-            <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')">
+            <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=1200&h=800&fit=crop')">
                 <div class="carousel-content">
                     <h1>Qualidade Garantida</h1>
                     <p>Ingredientes frescos e preparação artesanal para uma experiência gastronômica única</p>
@@ -541,6 +547,10 @@
         let carouselInterval;
 
         function showSlide(index) {
+            // Ensure index is within bounds
+            if (index < 0) index = totalSlides - 1;
+            if (index >= totalSlides) index = 0;
+            
             // Remove active class from all slides and dots
             slides.forEach(slide => {
                 slide.classList.remove('active');
@@ -551,27 +561,34 @@
             slides[index].classList.add('active');
             dots[index].classList.add('active');
             
+            currentSlide = index;
             console.log(`Showing slide ${index + 1} of ${totalSlides}`);
         }
 
         function nextSlide() {
-            currentSlide = (currentSlide + 1) % totalSlides;
-            showSlide(currentSlide);
-            console.log(`Auto-advancing to slide ${currentSlide + 1}`);
+            const nextIndex = (currentSlide + 1) % totalSlides;
+            showSlide(nextIndex);
+            console.log(`Auto-advancing to slide ${nextIndex + 1}`);
         }
 
         function startCarousel() {
-            carouselInterval = setInterval(nextSlide, 5000);
+            if (carouselInterval) clearInterval(carouselInterval);
+            carouselInterval = setInterval(nextSlide, 4000);
         }
 
         function stopCarousel() {
-            clearInterval(carouselInterval);
+            if (carouselInterval) {
+                clearInterval(carouselInterval);
+                carouselInterval = null;
+            }
         }
 
-        // Initialize carousel
-        console.log(`Carousel initialized with ${totalSlides} slides`);
-        showSlide(0);
-        startCarousel();
+        // Initialize carousel when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log(`Carousel initialized with ${totalSlides} slides`);
+            showSlide(0);
+            startCarousel();
+        });
 
         // Dot navigation
         dots.forEach((dot, index) => {
@@ -632,17 +649,23 @@
                     statusElement.className = 'restaurant-status status-closed';
                     statusText.textContent = 'Fechado';
                 }
+                console.log('Status do restaurante atualizado:', status);
             } catch (error) {
                 console.error('Erro ao verificar status:', error);
-                document.getElementById('statusText').textContent = 'Status indisponível';
+                const statusText = document.getElementById('statusText');
+                if (statusText) {
+                    statusText.textContent = 'Status indisponível';
+                }
             }
         }
 
-        // Verificar status ao carregar a página
-        checkRestaurantStatus();
-        
-        // Verificar status a cada 5 minutos
-        setInterval(checkRestaurantStatus, 300000);
+        // Verificar status quando DOM estiver carregado
+        document.addEventListener('DOMContentLoaded', function() {
+            checkRestaurantStatus();
+            
+            // Verificar status a cada 5 minutos
+            setInterval(checkRestaurantStatus, 300000);
+        });
     </script>
 </body>
 </html> 
