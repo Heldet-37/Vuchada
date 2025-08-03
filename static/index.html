@@ -152,8 +152,6 @@
 
         .mobile-menu a:nth-child(1) { transition-delay: 0.1s; }
         .mobile-menu a:nth-child(2) { transition-delay: 0.2s; }
-        .mobile-menu a:nth-child(3) { transition-delay: 0.3s; }
-        .mobile-menu a:nth-child(4) { transition-delay: 0.4s; }
 
         .mobile-menu a:hover {
             color: #D2691E;
@@ -223,14 +221,16 @@
             width: 100%;
             height: 100%;
             opacity: 0;
-            transition: opacity 1s ease-in-out;
+            transition: opacity 1.5s ease-in-out;
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
+            visibility: hidden;
         }
 
         .carousel-slide.active {
             opacity: 1;
+            visibility: visible;
         }
 
         .carousel-slide::before {
@@ -454,8 +454,6 @@
     <div class="mobile-menu" id="mobileMenu">
         <a href="/servicos">Serviços</a>
         <a href="/sobre">Sobre</a>
-        <a href="/cliente">Ver Cardápio</a>
-        <a href="/funcionario">Área Funcionário</a>
     </div>
 
     <!-- Restaurant Status -->
@@ -546,19 +544,20 @@
             // Remove active class from all slides and dots
             slides.forEach(slide => {
                 slide.classList.remove('active');
-                slide.style.opacity = '0';
             });
             dots.forEach(dot => dot.classList.remove('active'));
             
             // Add active class to current slide and dot
             slides[index].classList.add('active');
-            slides[index].style.opacity = '1';
             dots[index].classList.add('active');
+            
+            console.log(`Showing slide ${index + 1} of ${totalSlides}`);
         }
 
         function nextSlide() {
             currentSlide = (currentSlide + 1) % totalSlides;
             showSlide(currentSlide);
+            console.log(`Auto-advancing to slide ${currentSlide + 1}`);
         }
 
         function startCarousel() {
@@ -570,6 +569,7 @@
         }
 
         // Initialize carousel
+        console.log(`Carousel initialized with ${totalSlides} slides`);
         showSlide(0);
         startCarousel();
 
