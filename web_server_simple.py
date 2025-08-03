@@ -1,11 +1,11 @@
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, session, send_from_directory
 import sqlite3
 import hashlib
 from datetime import datetime, time
 import os
 from database import init_db
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 app.secret_key = 'pdv_restaurant_secret_key_2024'
 
 # Inicializar banco de dados
@@ -28,6 +28,18 @@ def hash_password(password):
 
 @app.route('/')
 def index():
+    return send_from_directory('static', 'index.html')
+
+@app.route('/cliente')
+def cliente():
+    return send_from_directory('static', 'cliente.html')
+
+@app.route('/funcionario')
+def funcionario():
+    return send_from_directory('static', 'funcionario.html')
+
+@app.route('/api')
+def api_info():
     return jsonify({
         'status': 'ok',
         'message': 'PDV Restaurante API funcionando!',
