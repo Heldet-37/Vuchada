@@ -286,7 +286,7 @@
         .cta-buttons {
             display: flex;
             gap: 1rem;
-            justify-content: center;
+            justify-content: flex-end;
             flex-wrap: wrap;
             animation: slideInUp 1s ease-out 0.6s both;
         }
@@ -321,6 +321,17 @@
             background: white;
             color: #FF8C00;
             border-color: white;
+        }
+
+        .cta-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        .cta-btn.disabled:hover {
+            transform: none;
+            box-shadow: none;
         }
 
         /* Carousel Navigation */
@@ -424,7 +435,7 @@
 
             .cta-buttons {
                 flex-direction: column;
-                align-items: center;
+                align-items: flex-end;
             }
 
             .restaurant-status {
@@ -478,7 +489,7 @@
                     <h1>Vuchada</h1>
                     <p>Descubra sabores únicos e experiências gastronômicas inesquecíveis</p>
                     <div class="cta-buttons">
-                        <a href="/cliente" class="cta-btn">🍽️ Ver Cardápio</a>
+                        <a href="/cliente" class="cta-btn cardapio-btn">🍽️ Ver Cardápio</a>
                         <a href="/funcionario" class="cta-btn secondary">👨‍💼 Área Funcionário</a>
                     </div>
                 </div>
@@ -488,7 +499,7 @@
                     <h1>Cardápio Digital</h1>
                     <p>Navegue pelo nosso cardápio interativo e faça pedidos diretamente do seu dispositivo</p>
                     <div class="cta-buttons">
-                        <a href="/cliente" class="cta-btn">🍽️ Ver Cardápio</a>
+                        <a href="/cliente" class="cta-btn cardapio-btn">🍽️ Ver Cardápio</a>
                         <a href="/funcionario" class="cta-btn secondary">👨‍💼 Área Funcionário</a>
                     </div>
                 </div>
@@ -498,7 +509,7 @@
                     <h1>Qualidade Garantida</h1>
                     <p>Ingredientes frescos e preparação artesanal para uma experiência gastronômica única</p>
                     <div class="cta-buttons">
-                        <a href="/cliente" class="cta-btn">🍽️ Ver Cardápio</a>
+                        <a href="/cliente" class="cta-btn cardapio-btn">🍽️ Ver Cardápio</a>
                         <a href="/funcionario" class="cta-btn secondary">👨‍💼 Área Funcionário</a>
                     </div>
                 </div>
@@ -508,7 +519,7 @@
                     <h1>Sobremesas Especiais</h1>
                     <p>Finalize sua refeição com nossas deliciosas sobremesas artesanais</p>
                     <div class="cta-buttons">
-                        <a href="/cliente" class="cta-btn">🍽️ Ver Cardápio</a>
+                        <a href="/cliente" class="cta-btn cardapio-btn">🍽️ Ver Cardápio</a>
                         <a href="/funcionario" class="cta-btn secondary">👨‍💼 Área Funcionário</a>
                     </div>
                 </div>
@@ -654,13 +665,22 @@
                 
                 const statusElement = document.getElementById('restaurantStatus');
                 const statusText = document.getElementById('statusText');
+                const cardapioBtns = document.querySelectorAll('.cardapio-btn');
                 
                 if (status.is_open) {
                     statusElement.className = 'restaurant-status status-open';
                     statusText.textContent = 'Aberto';
+                    cardapioBtns.forEach(btn => {
+                        btn.classList.remove('disabled');
+                        btn.textContent = '🍽️ Ver Cardápio';
+                    });
                 } else {
                     statusElement.className = 'restaurant-status status-closed';
                     statusText.textContent = 'Fechado';
+                    cardapioBtns.forEach(btn => {
+                        btn.classList.add('disabled');
+                        btn.textContent = '🔒 Cardápio Fechado';
+                    });
                 }
                 console.log('Status do restaurante atualizado:', status);
             } catch (error) {
