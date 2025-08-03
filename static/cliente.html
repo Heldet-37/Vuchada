@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuchada - Cardápio Digital</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <button class="back-btn" onclick="window.location.href='/'">←</button>
+            <div class="title">Cardápio Digital</div>
+            <button class="cart-btn" onclick="openCart()">
+                🛒 <span class="cart-count" id="cartCount">0</span>
+            </button>
+        </div>
+    </div>
+
+    <div class="search-container">
+        <input type="text" class="search-input" id="searchInput" placeholder="Buscar produtos...">
+    </div>
+
+    <div class="categories" id="categories">
+        <div class="loading">Carregando categorias...</div>
+    </div>
+
+    <div class="products">
+        <div class="products-grid" id="productsGrid">
+            <div class="loading">Carregando produtos...</div>
+        </div>
+    </div>
+
+    <!-- Modal do Carrinho -->
+    <div id="cartModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🛒 Seu Pedido</h2>
+                <span class="close" onclick="closeCart()">&times;</span>
+            </div>
+            
+            <div id="cartItems" class="cart-items">
+                <!-- Itens do carrinho serão inseridos aqui -->
+            </div>
+            
+            <div class="cart-total">
+                Total: <span id="cartTotal">0,00 MT</span>
+            </div>
+            
+            <form class="order-form" id="orderForm">
+                <div class="form-group">
+                    <label class="form-label">Mesa:</label>
+                    <select class="form-input" id="mesaSelect" required>
+                        <option value="">Selecione uma mesa</option>
+                    </select>
+                </div>
+                
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    Fazer Pedido
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="cliente.js"></script>
+</body>
+</html> 

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuchada - Sobre Nós</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #FF8C00, #FFA500);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #FF8C00, #FFA500);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #FF8C00;
+            }
+            to {
+                text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #FF8C00;
+            }
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .content-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #FF8C00;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .section-content {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 1.5rem;
+        }
+
+        .highlight {
+            color: #FF8C00;
+            font-weight: bold;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .info-card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .info-card h3 {
+            color: #FF8C00;
+            margin-bottom: 0.5rem;
+            font-size: 1.3rem;
+        }
+
+        .info-card p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .values-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .values-list li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+        }
+
+        .values-list li:before {
+            content: "✓";
+            color: #FF8C00;
+            font-weight: bold;
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .location-info {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .location-title {
+            font-size: 1.5rem;
+            color: #FF8C00;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .location-details {
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+
+            .section-content {
+                font-size: 1rem;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .hero-section {
+                padding: 2rem 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.8rem;
+            }
+
+            .title {
+                font-size: 1.2rem;
+            }
+
+            .content-section {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <button class="back-btn" onclick="window.location.href='/'">←</button>
+            <div class="title">Sobre Nós</div>
+            <div></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="hero-section">
+            <h1 class="hero-title">Vuchada</h1>
+            <p class="hero-subtitle">Sabor e Tradição em Gurúè, Moçambique</p>
+        </div>
+
+        <div class="content-section">
+            <h2 class="section-title">Nossa História</h2>
+            <p class="section-content">
+                O <span class="highlight">Restaurante Vuchada</span> nasceu da paixão pela gastronomia moçambicana e do desejo de oferecer aos nossos clientes uma experiência única de sabores autênticos. Localizado no coração de <span class="highlight">Gurúè, Moçambique</span>, somos mais que um restaurante - somos um ponto de encontro para famílias, amigos e todos que apreciam a boa comida.
+            </p>
+            <p class="section-content">
+                Fundado com a missão de preservar e celebrar a rica tradição culinária moçambicana, o Vuchada combina receitas tradicionais com técnicas modernas, criando pratos que contam histórias e despertam memórias.
+            </p>
+        </div>
+
+        <div class="content-section">
+            <h2 class="section-title">Nossa Missão</h2>
+            <p class="section-content">
+                Proporcionar uma experiência gastronômica excepcional, oferecendo pratos de qualidade superior preparados com ingredientes frescos e locais, sempre com o compromisso de satisfazer nossos clientes e contribuir para o desenvolvimento da comunidade local.
+            </p>
+        </div>
+
+        <div class="content-section">
+            <h2 class="section-title">Nossos Valores</h2>
+            <ul class="values-list">
+                <li><strong>Qualidade:</strong> Utilizamos apenas ingredientes frescos e de alta qualidade</li>
+                <li><strong>Tradição:</strong> Preservamos as receitas e sabores autênticos moçambicanos</li>
+                <li><strong>Hospitalidade:</strong> Tratamos cada cliente como parte da nossa família</li>
+                <li><strong>Sustentabilidade:</strong> Apoiamos produtores locais e práticas sustentáveis</li>
+                <li><strong>Inovação:</strong> Constantemente buscamos melhorar e inovar nossos serviços</li>
+                <li><strong>Comunidade:</strong> Contribuímos ativamente para o desenvolvimento de Gurúè</li>
+            </ul>
+        </div>
+
+        <div class="info-grid">
+            <div class="info-card">
+                <h3>Nossa Especialidade</h3>
+                <p>Culinária moçambicana tradicional com pratos como Matapa, Frango à Zambeziana, Caril de Camarão e muito mais, sempre preparados com ingredientes frescos e locais.</p>
+            </div>
+
+            <div class="info-card">
+                <h3>Ambiente</h3>
+                <p>Um ambiente acolhedor e familiar, perfeito para refeições em grupo, encontros românticos ou simplesmente desfrutar de uma boa refeição em boa companhia.</p>
+            </div>
+
+            <div class="info-card">
+                <h3>Horário de Funcionamento</h3>
+                <p>Estamos abertos de segunda a domingo, das 7h às 22h, oferecendo café da manhã, almoço e jantar para sua conveniência.</p>
+            </div>
+
+            <div class="info-card">
+                <h3>Reservas</h3>
+                <p>Aceitamos reservas para grupos e ocasiões especiais. Entre em contato conosco para garantir seu lugar em nossa casa.</p>
+            </div>
+        </div>
+
+        <div class="location-info">
+            <h3 class="location-title">Nossa Localização</h3>
+            <p class="location-details">
+                <strong>Endereço:</strong> Gurúè, Província da Zambézia, Moçambique<br>
+                <strong>Telefone:</strong> +258 XX XXX XXX<br>
+                <strong>Email:</strong> info@vuchada.co.mz
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Adicionar efeito de scroll suave
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html> 

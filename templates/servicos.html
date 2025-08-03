@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vuchada - Nossos Serviços</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #FF8C00, #FFA500);
+            color: white;
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .title {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #FF8C00, #FFA500);
+            color: white;
+            padding: 3rem 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .hero-title {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 0 0 5px #fff, 0 0 10px #fff, 0 0 15px #FF8C00;
+            }
+            to {
+                text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #FF8C00;
+            }
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .service-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .service-icon {
+            background: linear-gradient(135deg, #FF8C00, #FFA500);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            font-size: 3rem;
+        }
+
+        .service-content {
+            padding: 2rem;
+        }
+
+        .service-title {
+            font-size: 1.5rem;
+            color: #FF8C00;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .service-description {
+            color: #666;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .service-features {
+            list-style: none;
+            padding: 0;
+        }
+
+        .service-features li {
+            padding: 0.3rem 0;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+
+        .service-features li:before {
+            content: "•";
+            color: #FF8C00;
+            font-weight: bold;
+            margin-right: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .menu-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #FF8C00;
+            margin-bottom: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .menu-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .menu-category {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #FF8C00;
+        }
+
+        .menu-category h3 {
+            color: #FF8C00;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+
+        .menu-category p {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .special-offers {
+            background: linear-gradient(135deg, #FF8C00, #FFA500);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .offers-title {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .offers-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .offers-list li {
+            padding: 0.5rem 0;
+            font-size: 1.1rem;
+        }
+
+        .contact-section {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .contact-title {
+            font-size: 1.5rem;
+            color: #FF8C00;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .contact-info {
+            font-size: 1.1rem;
+            color: #333;
+        }
+
+        .contact-info a {
+            color: #FF8C00;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .contact-info a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1rem;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .menu-categories {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .hero-section {
+                padding: 2rem 1rem;
+            }
+
+            .service-content {
+                padding: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 1.8rem;
+            }
+
+            .title {
+                font-size: 1.2rem;
+            }
+
+            .service-title {
+                font-size: 1.3rem;
+            }
+
+            .section-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <button class="back-btn" onclick="window.location.href='/'">←</button>
+            <div class="title">Nossos Serviços</div>
+            <div></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="hero-section">
+            <h1 class="hero-title">Vuchada</h1>
+            <p class="hero-subtitle">Serviços Gastronômicos de Qualidade</p>
+        </div>
+
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-icon">🍽️</div>
+                <div class="service-content">
+                    <h3 class="service-title">Refeições no Local</h3>
+                    <p class="service-description">
+                        Desfrute de nossas deliciosas refeições em nosso ambiente acolhedor e familiar, perfeito para encontros com amigos e família.
+                    </p>
+                    <ul class="service-features">
+                        <li>Ambiente climatizado e confortável</li>
+                        <li>Atendimento personalizado</li>
+                        <li>Horário flexível (7h às 22h)</li>
+                        <li>Estacionamento disponível</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">📱</div>
+                <div class="service-content">
+                    <h3 class="service-title">Pedidos Online</h3>
+                    <p class="service-description">
+                        Faça seus pedidos através do nosso cardápio digital, com opção de pagamento no local ou delivery.
+                    </p>
+                    <ul class="service-features">
+                        <li>Cardápio digital interativo</li>
+                        <li>Pedidos em tempo real</li>
+                        <li>Múltiplas formas de pagamento</li>
+                        <li>Acompanhamento do status do pedido</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">🎉</div>
+                <div class="service-content">
+                    <h3 class="service-title">Eventos e Festas</h3>
+                    <p class="service-description">
+                        Organizamos eventos especiais, festas de aniversário, casamentos e reuniões corporativas com menus personalizados.
+                    </p>
+                    <ul class="service-features">
+                        <li>Decoração personalizada</li>
+                        <li>Menu sob medida</li>
+                        <li>Serviço completo de buffet</li>
+                        <li>Coordenador de eventos</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">🚚</div>
+                <div class="service-content">
+                    <h3 class="service-title">Delivery</h3>
+                    <p class="service-description">
+                        Entregamos nossos pratos em toda a região de Gurúè, mantendo a qualidade e temperatura dos alimentos.
+                    </p>
+                    <ul class="service-features">
+                        <li>Entrega rápida e segura</li>
+                        <li>Embalagem especial para viagem</li>
+                        <li>Rastreamento da entrega</li>
+                        <li>Pedido mínimo flexível</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">👥</div>
+                <div class="service-content">
+                    <h3 class="service-title">Reservas</h3>
+                    <p class="service-description">
+                        Garanta seu lugar em nosso restaurante com reservas antecipadas para grupos e ocasiões especiais.
+                    </p>
+                    <ul class="service-features">
+                        <li>Reservas online e telefônicas</li>
+                        <li>Mesas para grupos grandes</li>
+                        <li>Confirmação automática</li>
+                        <li>Flexibilidade de horários</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="service-card">
+                <div class="service-icon">🎁</div>
+                <div class="service-content">
+                    <h3 class="service-title">Vale-Presente</h3>
+                    <p class="service-description">
+                        Presenteie seus amigos e familiares com vales-presente do Vuchada, uma experiência gastronômica única.
+                    </p>
+                    <ul class="service-features">
+                        <li>Valores personalizados</li>
+                        <li>Embalagem elegante</li>
+                        <li>Validade estendida</li>
+                        <li>Válido para todos os serviços</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="menu-section">
+            <h2 class="section-title">Nossos Menus</h2>
+            <div class="menu-categories">
+                <div class="menu-category">
+                    <h3>🍳 Café da Manhã</h3>
+                    <p>Pães frescos, ovos, frutas tropicais, café moçambicano e sucos naturais para começar o dia com energia.</p>
+                </div>
+
+                <div class="menu-category">
+                    <h3>🍽️ Almoço</h3>
+                    <p>Pratos tradicionais moçambicanos como Matapa, Caril de Camarão, Frango à Zambeziana e muito mais.</p>
+                </div>
+
+                <div class="menu-category">
+                    <h3>🌙 Jantar</h3>
+                    <p>Especialidades da casa, pratos executivos e opções vegetarianas para um jantar memorável.</p>
+                </div>
+
+                <div class="menu-category">
+                    <h3>🍰 Sobremesas</h3>
+                    <p>Sobremesas tradicionais e contemporâneas, incluindo doces moçambicanos e sorvetes artesanais.</p>
+                </div>
+
+                <div class="menu-category">
+                    <h3>🥤 Bebidas</h3>
+                    <p>Refrigerantes, sucos naturais, cervejas locais e internacionais, e coquetéis especiais.</p>
+                </div>
+
+                <div class="menu-category">
+                    <h3>🍷 Vinhos</h3>
+                    <p>Seleção de vinhos nacionais e importados para harmonizar perfeitamente com nossos pratos.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="special-offers">
+            <h2 class="offers-title">Ofertas Especiais</h2>
+            <ul class="offers-list">
+                <li>🎉 <strong>Segunda-feira:</strong> 20% de desconto em todos os pratos principais</li>
+                <li>👥 <strong>Terça-feira:</strong> Menu executivo com preço especial para grupos</li>
+                <li>🍰 <strong>Quarta-feira:</strong> Sobremesa grátis com qualquer prato principal</li>
+                <li>🍷 <strong>Quinta-feira:</strong> Happy Hour com 50% de desconto em bebidas</li>
+                <li>👨‍👩‍👧‍👦 <strong>Fim de semana:</strong> Menu familiar com preços especiais</li>
+                <li>🎂 <strong>Aniversariantes:</strong> Prato principal grátis no mês do aniversário</li>
+            </ul>
+        </div>
+
+        <div class="contact-section">
+            <h3 class="contact-title">Entre em Contato</h3>
+            <p class="contact-info">
+                <strong>Telefone:</strong> <a href="tel:+258XXXXXXXX">+258 XX XXX XXX</a><br>
+                <strong>WhatsApp:</strong> <a href="https://wa.me/258XXXXXXXX">+258 XX XXX XXX</a><br>
+                <strong>Email:</strong> <a href="mailto:info@vuchada.co.mz">info@vuchada.co.mz</a><br>
+                <strong>Endereço:</strong> Gurúè, Província da Zambézia, Moçambique<br>
+                <strong>Horário:</strong> Segunda a Domingo, das 7h às 22h
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Adicionar efeito de scroll suave
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Adicionar animação aos cards quando aparecem na tela
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observar todos os cards de serviço
+        document.querySelectorAll('.service-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html> 

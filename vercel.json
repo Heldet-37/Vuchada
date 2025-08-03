@@ -1,0 +1,31 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "static/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/",
+      "dest": "/static/index.html"
+    },
+    {
+      "src": "/cliente",
+      "dest": "/static/cliente.html"
+    },
+    {
+      "src": "/funcionario",
+      "dest": "/static/funcionario.html"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "https://seu-backend.herokuapp.com/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/static/$1"
+    }
+  ]
+} 

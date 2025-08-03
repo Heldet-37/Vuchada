@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cardápio Digital</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .title {
+            text-align: center;
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .button {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            margin: 10px 0;
+            background: #007bff;
+            color: white;
+            text-decoration: none;
+            text-align: center;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .button:hover {
+            background: #0056b3;
+        }
+
+        .button.cliente {
+            background: #28a745;
+        }
+
+        .button.cliente:hover {
+            background: #1e7e34;
+        }
+
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+            background: #d4edda;
+            color: #155724;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">🍽️ Cardápio Digital</div>
+        
+        <a href="/cliente" class="button cliente">👤 Cliente</a>
+        <a href="/funcionario" class="button">👨‍💼 Funcionário</a>
+        
+        <div class="status">
+            ✅ Servidor funcionando - IP: 192.168.43.118:5000
+        </div>
+    </div>
+</body>
+</html> 
