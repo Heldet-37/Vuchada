@@ -115,6 +115,7 @@
             box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             transform: translateY(-100%);
             transition: transform 0.3s ease;
+            z-index: 999;
         }
 
         .mobile-menu.active {
@@ -214,7 +215,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(135deg, rgba(255, 140, 0, 0.8) 0%, rgba(255, 165, 0, 0.6) 50%, rgba(255, 215, 0, 0.4) 100%);
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.3) 50%, rgba(0, 0, 0, 0.2) 100%);
         }
 
         .carousel-content {
@@ -264,20 +265,23 @@
         }
 
         .cta-btn {
-            background: white;
-            color: #FF8C00;
+            background: #FF8C00;
+            color: white;
             padding: 1rem 2rem;
             border-radius: 50px;
             text-decoration: none;
             font-weight: bold;
             font-size: 1.1rem;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            border: 2px solid #FF8C00;
         }
 
         .cta-btn:hover {
             transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+            background: #D2691E;
+            border-color: #D2691E;
         }
 
         .cta-btn.secondary {
@@ -289,6 +293,7 @@
         .cta-btn.secondary:hover {
             background: white;
             color: #FF8C00;
+            border-color: white;
         }
 
         /* Carousel Navigation */
@@ -437,7 +442,7 @@
     <!-- Hero Section with Carousel -->
     <section class="hero">
         <div class="carousel">
-            <div class="carousel-slide active" style="background-image: url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')">
+            <div class="carousel-slide active" style="background-image: url('https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80')">
                 <div class="carousel-content">
                     <h1>Vuchada</h1>
                     <p>Descubra sabores únicos e experiências gastronômicas inesquecíveis</p>
@@ -447,7 +452,7 @@
                     </div>
                 </div>
             </div>
-            <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2074&q=80')">
+            <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')">
                 <div class="carousel-content">
                     <h1>Cardápio Digital</h1>
                     <p>Navegue pelo nosso cardápio interativo e faça pedidos diretamente do seu dispositivo</p>
@@ -457,7 +462,7 @@
                     </div>
                 </div>
             </div>
-            <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')">
+            <div class="carousel-slide" style="background-image: url('https://images.unsplash.com/photo-1504674900240-9a9049b7d8ce?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80')">
                 <div class="carousel-content">
                     <h1>Qualidade Garantida</h1>
                     <p>Ingredientes frescos e preparação artesanal para uma experiência gastronômica única</p>
@@ -539,7 +544,9 @@
         const hamburger = document.getElementById('hamburger');
         const mobileMenu = document.getElementById('mobileMenu');
 
-        hamburger.addEventListener('click', () => {
+        hamburger.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             hamburger.classList.toggle('active');
             mobileMenu.classList.toggle('active');
         });
@@ -550,6 +557,14 @@
                 hamburger.classList.remove('active');
                 mobileMenu.classList.remove('active');
             });
+        });
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+                hamburger.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            }
         });
 
         // Verificar status do restaurante
