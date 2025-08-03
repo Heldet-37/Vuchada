@@ -3,9 +3,13 @@ import sqlite3
 import hashlib
 from datetime import datetime, time
 import os
+from database import init_db
 
 app = Flask(__name__)
 app.secret_key = 'pdv_restaurant_secret_key_2024'
+
+# Inicializar banco de dados
+init_db()
 
 def get_db_connection():
     conn = sqlite3.connect('database/restaurant.db')
@@ -47,6 +51,10 @@ def get_restaurant_status():
 def index():
     status = get_restaurant_status()
     return render_template('index.html', restaurant_status=status)
+
+@app.route('/test')
+def test():
+    return jsonify({'status': 'ok', 'message': 'Aplicação funcionando!'})
 
 @app.route('/simple')
 def simple():

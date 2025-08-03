@@ -1,7 +1,7 @@
 // Configuração da API
 const API_CONFIG = {
     // URL do backend (mude para sua URL real)
-    BASE_URL: 'https://seu-backend.herokuapp.com',
+    BASE_URL: 'https://web-production-5220.up.railway.app',
     
     // URLs das APIs
     CATEGORIAS: '/api/categorias',
@@ -25,5 +25,5 @@ if (window.location.hostname === 'localhost' || window.location.hostname === '12
     API_CONFIG.BASE_URL = 'http://localhost:5000';
 } else {
     // Produção - usar URL do backend hospedado
-    API_CONFIG.BASE_URL = 'https://seu-backend.herokuapp.com';
+    API_CONFIG.BASE_URL = 'https://web-production-5220.up.railway.app';
 } 
