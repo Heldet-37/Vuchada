@@ -4,7 +4,7 @@ import sqlite3
 import hashlib
 from datetime import datetime, time
 import os
-from database import init_db
+from database.db import init_db
 
 app = Flask(__name__, static_folder='static')
 CORS(app)  # Permitir CORS para todas as origens
@@ -86,7 +86,7 @@ def get_produtos():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute('SELECT id, name, description, price, stock FROM products WHERE stock > 0')
+        cursor.execute('SELECT id, name, description, price, stock, image_url FROM products WHERE stock > 0')
         produtos = []
         for row in cursor.fetchall():
             produtos.append({
@@ -96,6 +96,7 @@ def get_produtos():
                 'price': row['price'],
                 'price_formatted': format_metical(row['price']),
                 'stock': row['stock'],
+                'image_url': row['image_url'] or '',
                 'has_variations': False
             })
         conn.close()
@@ -166,6 +167,8 @@ def login():
         username = data.get('username')
         password = data.get('password')
         
+        print(f"🔐 Tentativa de login: {username}")
+        
         conn = get_db_connection()
         cursor = conn.cursor()
         hashed_password = hash_password(password)
@@ -175,11 +178,14 @@ def login():
         
         if user:
             session['user_id'] = user['id']
+            print(f"✅ Login bem-sucedido: {user['name']} (ID: {user['id']})")
             return jsonify({'success': True, 'redirect': '/funcionario/pedidos'})
         else:
+            print(f"❌ Login falhou para: {username}")
             return jsonify({'success': False, 'message': 'Usuário ou senha inválidos'})
             
     except Exception as e:
+        print(f"❌ Erro no login: {e}")
         return jsonify({'success': False, 'message': str(e)})
 
 @app.route('/api/restaurant-status')
@@ -188,23 +194,33 @@ def get_restaurant_status():
 
 @app.route('/api/user-info')
 def get_user_info():
+    print(f"🔍 Verificando usuário - Session user_id: {session.get('user_id')}")
+    
     if 'user_id' not in session:
+        print("❌ Usuário não logado")
         return jsonify({'logged_in': False})
     
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    cursor.execute('SELECT name, role FROM users WHERE id = ?', (session['user_id'],))
-    user = cursor.fetchone()
-    conn.close()
-    
-    if user:
-        return jsonify({
-            'logged_in': True, 
-            'name': user['name'],
-            'role': user['role']
-        })
-    else:
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('SELECT name, role FROM users WHERE id = ?', (session['user_id'],))
+        user = cursor.fetchone()
+        conn.close()
+        
+        if user:
+            print(f"✅ Usuário encontrado: {user['name']} - Role: {user['role']}")
+            return jsonify({
+                'logged_in': True, 
+                'name': user['name'],
+                'role': user['role']
+            })
+        else:
+            print("❌ Usuário não encontrado no banco")
+            return jsonify({'logged_in': False})
+            
+    except Exception as e:
+        print(f"❌ Erro ao buscar usuário: {e}")
         return jsonify({'logged_in': False})
 
 @app.route('/api/pedidos')
