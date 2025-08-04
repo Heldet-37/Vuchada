@@ -49,7 +49,7 @@ class ProductView(ft.UserControl):
 
     def load_categories(self):
         try:
-            conn = sqlite3.connect('restaurant.db')
+            conn = sqlite3.connect('database/restaurant.db')
             cursor = conn.cursor()
             cursor.execute("SELECT id, name FROM categories ORDER BY name")
             self.categories = cursor.fetchall()
@@ -59,7 +59,7 @@ class ProductView(ft.UserControl):
 
     def load_products(self):
         try:
-            conn = sqlite3.connect('restaurant.db')
+            conn = sqlite3.connect('database/restaurant.db')
             cursor = conn.cursor()
             cursor.execute("""
                 SELECT p.id, p.name, p.price, p.description, p.image_url, p.stock, c.name as category_name
@@ -163,7 +163,7 @@ class ProductView(ft.UserControl):
                     self.page.show_snack_bar(ft.SnackBar(content=ft.Text("Nome é obrigatório!")))
                     return
                 
-                conn = sqlite3.connect('restaurant.db')
+                conn = sqlite3.connect('database/restaurant.db')
                 cursor = conn.cursor()
                 
                 if self.is_editing:
@@ -216,7 +216,7 @@ class ProductView(ft.UserControl):
     def delete_product(self, product):
         def confirm_delete(e):
             try:
-                conn = sqlite3.connect('restaurant.db')
+                conn = sqlite3.connect('database/restaurant.db')
                 cursor = conn.cursor()
                 cursor.execute("DELETE FROM products WHERE id=?", (product[0],))
                 conn.commit()
