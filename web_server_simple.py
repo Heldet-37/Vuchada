@@ -189,52 +189,70 @@ def get_restaurant_status():
 @app.route('/api/user-info')
 def get_user_info():
     if 'user_id' not in session:
-        return jsonify({'success': False})
+        return jsonify({'logged_in': False})
     
     conn = get_db_connection()
     cursor = conn.cursor()
     
-    cursor.execute('SELECT name FROM users WHERE id = ?', (session['user_id'],))
+    cursor.execute('SELECT name, role FROM users WHERE id = ?', (session['user_id'],))
     user = cursor.fetchone()
     conn.close()
     
     if user:
-        return jsonify({'success': True, 'name': user['name']})
+        return jsonify({
+            'logged_in': True, 
+            'name': user['name'],
+            'role': user['role']
+        })
     else:
-        return jsonify({'success': False})
+        return jsonify({'logged_in': False})
 
 @app.route('/api/pedidos')
 def get_pedidos():
+    print(f"🔍 Verificando pedidos - Session user_id: {session.get('user_id')}")
+    
     if 'user_id' not in session:
+        print("❌ Usuário não logado")
         return jsonify([])
     
-    conn = get_db_connection()
-    cursor = conn.cursor()
-    
-    cursor.execute('''
-        SELECT o.id, o.status, o.total_amount, o.created_at,
-               t.number as table_number, t.capacity,
-               CONCAT('Mesa ', t.number) as table_name
-        FROM orders o
-        LEFT JOIN tables t ON o.table_id = t.id
-        ORDER BY o.created_at DESC
-    ''')
-    
-    pedidos = []
-    for row in cursor.fetchall():
-        pedidos.append({
-            'id': row['id'],
-            'status': row['status'],
-            'total': row['total_amount'],
-            'total_formatted': format_metical(row['total_amount']),
-            'created_at': row['created_at'],
-            'table_name': row['table_name'],
-            'table_number': row['table_number'],
-            'capacity': row['capacity']
-        })
-    
-    conn.close()
-    return jsonify(pedidos)
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT o.id, o.status, o.total_amount, o.created_at,
+                   t.number as table_number, t.capacity,
+                   'Mesa ' || t.number as table_name
+            FROM orders o
+            LEFT JOIN tables t ON o.table_id = t.id
+            ORDER BY o.created_at DESC
+        ''')
+        
+        pedidos = []
+        rows = cursor.fetchall()
+        print(f"📊 Encontrados {len(rows)} pedidos")
+        
+        for row in rows:
+            pedido = {
+                'id': row['id'],
+                'status': row['status'],
+                'total': row['total_amount'],
+                'total_formatted': format_metical(row['total_amount']),
+                'created_at': row['created_at'],
+                'table_name': row['table_name'],
+                'table_number': row['table_number'],
+                'capacity': row['capacity']
+            }
+            pedidos.append(pedido)
+            print(f"📋 Pedido {row['id']}: Mesa {row['table_name']}, Status: {row['status']}")
+        
+        conn.close()
+        print(f"✅ Retornando {len(pedidos)} pedidos")
+        return jsonify(pedidos)
+        
+    except Exception as e:
+        print(f"❌ Erro ao buscar pedidos: {e}")
+        return jsonify([])
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
