@@ -308,6 +308,32 @@
             padding: 3rem;
             color: #666;
             font-size: 1.1rem;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            margin: 2rem auto;
+            max-width: 500px;
+        }
+
+        .error-message {
+            text-align: center;
+            padding: 2rem;
+            color: #721c24;
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 15px;
+            margin: 2rem auto;
+            max-width: 500px;
+        }
+
+        .error-message h3 {
+            color: #721c24;
+            margin-bottom: 1rem;
+        }
+
+        .error-message p {
+            margin-bottom: 1.5rem;
+            color: #721c24;
         }
 
         /* Modal de detalhes */
@@ -929,20 +955,51 @@
                 }
                 
                 console.log('🔍 Carregando pedidos de:', url);
-                const response = await fetch(url);
+                
+                // Mostrar loading
+                document.getElementById('ordersGrid').innerHTML = '<div class="loading">🔄 Carregando pedidos...</div>';
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Cache-Control': 'no-cache'
+                    },
+                    credentials: 'include'
+                });
+                
                 console.log('📡 Response status:', response.status);
                 
                 if (!response.ok) {
+                    if (response.status === 401) {
+                        // Usuário não logado, redirecionar para login
+                        window.location.href = '/funcionario';
+                        return;
+                    }
                     throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
                 
-                orders = await response.json();
-                console.log('📊 Pedidos recebidos:', orders);
+                const data = await response.json();
+                console.log('📊 Dados recebidos:', data);
+                
+                // Verificar se é um array ou objeto com erro
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                orders = Array.isArray(data) ? data : [];
+                console.log('📊 Pedidos processados:', orders);
                 renderOrders();
+                
             } catch (error) {
                 console.error('❌ Erro ao carregar pedidos:', error);
-                document.getElementById('ordersGrid').innerHTML = 
-                    '<div class="loading">Erro ao carregar pedidos: ' + error.message + '</div>';
+                document.getElementById('ordersGrid').innerHTML = `
+                    <div class="error-message">
+                        <h3>❌ Erro ao carregar pedidos</h3>
+                        <p>${error.message}</p>
+                        <button onclick="loadOrders()" class="refresh-btn">🔄 Tentar Novamente</button>
+                    </div>
+                `;
             }
         }
 
@@ -958,47 +1015,66 @@
             }
             
             if (orders.length === 0) {
-                container.innerHTML = '<div class="no-orders">Nenhum pedido encontrado</div>';
+                container.innerHTML = `
+                    <div class="no-orders">
+                        <h3>📭 Nenhum pedido encontrado</h3>
+                        <p>Não há pedidos com o filtro selecionado.</p>
+                        <button onclick="loadOrders()" class="refresh-btn">🔄 Atualizar</button>
+                    </div>
+                `;
                 return;
             }
             
-            container.innerHTML = orders.map(order => `
-                <div class="order-card">
-                    <div class="order-header">
-                        <div class="order-id">Pedido #${order.id}</div>
-                        <div class="order-status status-${order.status}">${order.status}</div>
-                    </div>
-                    
-                    <div class="order-info">
-                        <div class="order-info-row">
-                            <span class="order-info-label">Mesa:</span>
-                            <span class="order-info-value">${order.table_name}</span>
+            container.innerHTML = orders.map(order => {
+                // Garantir que todos os campos existam
+                const orderData = {
+                    id: order.id || 'N/A',
+                    status: order.status || 'pendente',
+                    table_name: order.table_name || 'Mesa não definida',
+                    created_at: order.created_at || new Date().toISOString(),
+                    total_formatted: order.total_formatted || '0,00 MT',
+                    observations: order.observations || null,
+                    total: order.total || 0
+                };
+                
+                return `
+                    <div class="order-card">
+                        <div class="order-header">
+                            <div class="order-id">Pedido #${orderData.id}</div>
+                            <div class="order-status status-${orderData.status}">${orderData.status}</div>
                         </div>
-                        <div class="order-info-row">
-                            <span class="order-info-label">Data/Hora:</span>
-                            <span class="order-info-value">${formatDateTime(order.created_at)}</span>
-                        </div>
-                        ${order.observations ? `
-                            <div class="order-info-row">
-                                <span class="order-info-label">Observações:</span>
-                                <span class="order-info-value">${order.observations}</span>
-                            </div>
-                        ` : ''}
-                    </div>
-                    
-                    <div class="order-total">
-                        Total: ${order.total_formatted}
-                    </div>
-                    
-                    <div class="order-actions">
-                        <button class="action-btn btn-detalhes" onclick="showDetails(${order.id})">
-                            📋 Detalhes
-                        </button>
                         
-                        ${getStatusButtons(order)}
+                        <div class="order-info">
+                            <div class="order-info-row">
+                                <span class="order-info-label">Mesa:</span>
+                                <span class="order-info-value">${orderData.table_name}</span>
+                            </div>
+                            <div class="order-info-row">
+                                <span class="order-info-label">Data/Hora:</span>
+                                <span class="order-info-value">${formatDateTime(orderData.created_at)}</span>
+                            </div>
+                            ${orderData.observations ? `
+                                <div class="order-info-row">
+                                    <span class="order-info-label">Observações:</span>
+                                    <span class="order-info-value">${orderData.observations}</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                        
+                        <div class="order-total">
+                            Total: ${orderData.total_formatted}
+                        </div>
+                        
+                        <div class="order-actions">
+                            <button class="action-btn btn-detalhes" onclick="showDetails(${orderData.id})">
+                                📋 Detalhes
+                            </button>
+                            
+                            ${getStatusButtons(orderData)}
+                        </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
         }
 
         // Obter botões de status baseado no status atual
@@ -1062,26 +1138,49 @@
             if (!currentOrderId) return;
             
             try {
+                // Mostrar loading no modal
+                const statusOptions = document.querySelectorAll('.status-option');
+                statusOptions.forEach(option => {
+                    option.style.pointerEvents = 'none';
+                    option.style.opacity = '0.5';
+                });
+                
                 const response = await fetch(API_CONFIG.getUrl(`/api/pedido/${currentOrderId}/status`), {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ status: newStatus })
+                    body: JSON.stringify({ status: newStatus }),
+                    credentials: 'include'
                 });
+                
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/funcionario';
+                        return;
+                    }
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
                 
                 const result = await response.json();
                 
                 if (result.success) {
-                    showToast(`Status alterado para: ${newStatus}`, 'success');
+                    showToast(`✅ Status alterado para: ${newStatus}`, 'success');
                     closeStatusModal();
                     loadOrders(); // Recarregar pedidos
                 } else {
-                    showToast(`Erro: ${result.message}`, 'error');
+                    showToast(`❌ Erro: ${result.message}`, 'error');
                 }
             } catch (error) {
-                showToast('Erro ao alterar status. Tente novamente.', 'error');
+                showToast('❌ Erro ao alterar status. Tente novamente.', 'error');
                 console.error('Erro:', error);
+            } finally {
+                // Restaurar interatividade
+                const statusOptions = document.querySelectorAll('.status-option');
+                statusOptions.forEach(option => {
+                    option.style.pointerEvents = 'auto';
+                    option.style.opacity = '1';
+                });
             }
         }
 
@@ -1295,10 +1394,28 @@
         // Mostrar detalhes do pedido
         async function showDetails(orderId) {
             try {
-                const response = await fetch(API_CONFIG.getUrl(`/api/pedido/${orderId}/itens`));
-                const items = await response.json();
+                // Mostrar loading
+                document.getElementById('orderDetails').innerHTML = '<div class="loading">🔄 Carregando detalhes...</div>';
+                document.getElementById('detailsModal').classList.add('show');
                 
+                const response = await fetch(API_CONFIG.getUrl(`/api/pedido/${orderId}/itens`), {
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    if (response.status === 401) {
+                        window.location.href = '/funcionario';
+                        return;
+                    }
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const items = await response.json();
                 const order = orders.find(o => o.id === orderId);
+                
+                if (!order) {
+                    throw new Error('Pedido não encontrado');
+                }
                 
                 document.getElementById('orderDetails').innerHTML = `
                     <div class="order-info">
@@ -1312,7 +1429,9 @@
                         </div>
                         <div class="order-info-row">
                             <span class="order-info-label">Status:</span>
-                            <span class="order-info-value">${order.status}</span>
+                            <span class="order-info-value">
+                                <span class="order-status status-${order.status}">${order.status}</span>
+                            </span>
                         </div>
                         <div class="order-info-row">
                             <span class="order-info-label">Data/Hora:</span>
@@ -1327,20 +1446,20 @@
                     </div>
                     
                     <div class="order-items">
-                        <h3>Itens do Pedido:</h3>
-                        ${items.map(item => `
+                        <h3>📋 Itens do Pedido:</h3>
+                        ${items.length > 0 ? items.map(item => `
                             <div class="order-item">
                                 <div class="item-info">
-                                    <div class="item-name">${item.name}</div>
+                                    <div class="item-name">${item.name || 'Produto não encontrado'}</div>
                                     <div class="item-details">
-                                        ${item.quantity}x ${item.unit_price_formatted}
+                                        ${item.quantity || 0}x ${item.unit_price_formatted || '0,00 MT'}
                                     </div>
                                 </div>
                                 <div class="item-total">
-                                    ${item.total_formatted}
+                                    ${item.total_formatted || '0,00 MT'}
                                 </div>
                             </div>
-                        `).join('')}
+                        `).join('') : '<p>Nenhum item encontrado para este pedido.</p>'}
                     </div>
                     
                     <div class="order-total">
@@ -1348,10 +1467,15 @@
                     </div>
                 `;
                 
-                document.getElementById('detailsModal').classList.add('show'); // Use flex
             } catch (error) {
-                showToast('Erro ao carregar detalhes do pedido.', 'error');
-                console.error('Erro:', error);
+                console.error('Erro ao carregar detalhes:', error);
+                document.getElementById('orderDetails').innerHTML = `
+                    <div class="error-message">
+                        <h3>❌ Erro ao carregar detalhes</h3>
+                        <p>${error.message}</p>
+                        <button onclick="showDetails(${orderId})" class="refresh-btn">🔄 Tentar Novamente</button>
+                    </div>
+                `;
             }
         }
 
@@ -1381,42 +1505,82 @@
             window.location.href = '/logout';
         }
 
+        // Função para abrir menu admin
+        function openAdminMenu() {
+            window.location.href = '/admin';
+        }
+
         // Fechar modal ao clicar fora
         window.onclick = function(event) {
             const detailsModal = document.getElementById('detailsModal');
             const statusModal = document.getElementById('statusModal');
             const confirmModal = document.getElementById('confirmModal');
+            const paymentModal = document.getElementById('paymentModal');
+            const saleModal = document.getElementById('saleModal');
             
             if (event.target === detailsModal) {
                 closeDetails();
             }
-            if (evenpizt.target === statusModal) {
+            if (event.target === statusModal) {
                 closeStatusModal();
             }
             if (event.target === confirmModal) {
                 closeConfirmModal();
+            }
+            if (event.target === paymentModal) {
+                closePaymentModal();
+            }
+            if (event.target === saleModal) {
+                closeSaleModal();
             }
         }
 
         // Auto-refresh a cada 60 segundos (reduzido para evitar muitas requisições)
         setInterval(loadOrders, 60000);
 
-        // Carregar informações do usuário
-        async function loadUserInfo() {
+
+
+        // Verificar se o usuário está logado
+        async function checkUserLogin() {
             try {
-                const response = await fetch(API_CONFIG.getUrl('/api/user-info'));
+                const response = await fetch(API_CONFIG.getUrl('/api/user-info'), {
+                    credentials: 'include'
+                });
+                
+                if (!response.ok) {
+                    window.location.href = '/funcionario';
+                    return;
+                }
+                
                 const userInfo = await response.json();
-                if (userInfo.logged_in) {
+                if (!userInfo.logged_in) {
+                    window.location.href = '/funcionario';
+                    return;
+                }
+                
+                // Carregar informações do usuário
+                if (userInfo.name) {
                     document.getElementById('userName').textContent = userInfo.name;
                 }
+                
+                // Mostrar botão admin se for admin
+                if (userInfo.role === 'admin') {
+                    const adminBtn = document.getElementById('adminBtn');
+                    if (adminBtn) {
+                        adminBtn.style.display = 'block';
+                    }
+                }
+                
             } catch (error) {
-                console.error('Erro ao carregar informações do usuário:', error);
+                console.error('Erro ao verificar login:', error);
+                window.location.href = '/funcionario';
             }
         }
 
         // Inicializar
-        loadOrders();
-        loadUserInfo();
+        checkUserLogin().then(() => {
+            loadOrders();
+        });
     </script>
 
     <!-- Modal para alterar status -->
