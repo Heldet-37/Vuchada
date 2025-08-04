@@ -113,7 +113,7 @@
 
         /* Mobile Menu */
         .mobile-menu {
-            display: none;
+            display: block;
             position: fixed;
             top: 80px;
             left: 0;
@@ -126,11 +126,13 @@
             transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
             z-index: 2000;
             opacity: 0;
+            pointer-events: none;
         }
 
         .mobile-menu.active {
             transform: translateY(0);
             opacity: 1;
+            pointer-events: auto;
         }
 
         .mobile-menu a {
@@ -227,11 +229,13 @@
             background-position: center;
             background-repeat: no-repeat;
             visibility: hidden;
+            z-index: 1;
         }
 
         .carousel-slide.active {
             opacity: 1;
             visibility: visible;
+            z-index: 2;
         }
 
         .carousel-slide::before {
@@ -424,6 +428,13 @@
             .mobile-menu {
                 display: block;
             }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-menu {
+                display: none !important;
+            }
+        }
 
             .carousel-content h1 {
                 font-size: 2.5rem;
