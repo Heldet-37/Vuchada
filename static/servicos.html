@@ -17,41 +17,155 @@
             line-height: 1.6;
         }
 
+        /* Header */
         .header {
-            background: linear-gradient(135deg, #FF8C00, #FFA500);
-            color: white;
-            padding: 1rem;
-            position: sticky;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            padding: 1rem 2rem;
+            position: fixed;
             top: 0;
-            z-index: 100;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
         }
 
-        .header-content {
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #FF8C00;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            max-width: 1200px;
-            margin: 0 auto;
+            gap: 0.5rem;
+            animation: pulse 2s infinite;
         }
 
-        .back-btn {
-            background: none;
-            border: none;
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 2px solid #FF8C00;
+            color: #FF8C00;
+            padding: 0.5rem 1.5rem;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #FF8C00;
             color: white;
-            font-size: 1.5rem;
+            transform: translateY(-2px);
+        }
+
+        /* Hamburger Menu */
+        .hamburger {
+            display: none;
+            flex-direction: column;
             cursor: pointer;
             padding: 0.5rem;
+            transition: all 0.3s ease;
         }
 
-        .title {
-            font-size: 1.5rem;
-            font-weight: bold;
+        .hamburger:hover {
+            transform: scale(1.1);
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: #FF8C00;
+            margin: 3px 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border-radius: 2px;
+            transform-origin: center;
+        }
+
+        .hamburger.active span:nth-child(1) {
+            transform: rotate(-45deg) translate(-5px, 6px);
+            background: #D2691E;
+        }
+
+        .hamburger.active span:nth-child(2) {
+            opacity: 0;
+            transform: scaleX(0);
+        }
+
+        .hamburger.active span:nth-child(3) {
+            transform: rotate(45deg) translate(-5px, -6px);
+            background: #D2691E;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            display: block;
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 2rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transform: translateY(-100%);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .mobile-menu.active {
+            transform: translateY(0);
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .mobile-menu a {
+            display: block;
+            padding: 1rem 0;
+            color: #FF8C00;
+            text-decoration: none;
+            font-weight: 600;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s ease;
+            transform: translateX(-20px);
+            opacity: 0;
+        }
+
+        .mobile-menu.active a {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .mobile-menu a:nth-child(1) { transition-delay: 0.1s; }
+        .mobile-menu a:nth-child(2) { transition-delay: 0.2s; }
+
+        .mobile-menu a:hover {
+            color: #D2691E;
+            padding-left: 1rem;
+            background: rgba(255, 140, 0, 0.1);
+            border-radius: 8px;
         }
 
         .container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 2rem 1rem;
+            margin-top: 100px;
         }
 
         .hero-section {
@@ -244,259 +358,221 @@
             text-decoration: underline;
         }
 
+        .back-btn {
+            background: #FF8C00;
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: #D2691E;
+            transform: translateY(-2px);
+        }
+
+        /* Responsive */
         @media (max-width: 768px) {
-            .hero-title {
-                font-size: 2rem;
+            .nav-buttons {
+                display: none;
             }
 
-            .hero-subtitle {
-                font-size: 1rem;
+            .hamburger {
+                display: flex;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+
+            .hero-title {
+                font-size: 2rem;
             }
 
             .services-grid {
                 grid-template-columns: 1fr;
             }
-
-            .menu-categories {
-                grid-template-columns: 1fr;
-            }
-
-            .container {
-                padding: 1rem;
-            }
-
-            .hero-section {
-                padding: 2rem 1rem;
-            }
-
-            .service-content {
-                padding: 1.5rem;
-            }
         }
 
-        @media (max-width: 480px) {
-            .hero-title {
-                font-size: 1.8rem;
-            }
-
-            .title {
-                font-size: 1.2rem;
-            }
-
-            .service-title {
-                font-size: 1.3rem;
-            }
-
-            .section-title {
-                font-size: 1.5rem;
+        @media (min-width: 769px) {
+            .mobile-menu {
+                display: none !important;
             }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-content">
-            <button class="back-btn" onclick="window.location.href='/'">←</button>
-            <div class="title">Nossos Serviços</div>
-            <div></div>
+    <!-- Header -->
+    <header class="header">
+        <div class="logo">
+            🍽️ Vuchada
         </div>
+        <nav class="nav-buttons">
+            <a href="/servicos" class="nav-btn">Serviços</a>
+            <a href="/sobre" class="nav-btn">Sobre</a>
+        </nav>
+        <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </header>
+
+    <!-- Mobile Menu -->
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="/servicos">Serviços</a>
+        <a href="/sobre">Sobre</a>
     </div>
 
     <div class="container">
+        <button class="back-btn" onclick="window.location.href='/'">
+            ← Voltar ao Menu Principal
+        </button>
+        
         <div class="hero-section">
-            <h1 class="hero-title">Vuchada</h1>
-            <p class="hero-subtitle">Serviços Gastronômicos de Qualidade</p>
+            <h1 class="hero-title">Nossos Serviços</h1>
+            <p class="hero-subtitle">Descubra tudo que oferecemos para tornar sua experiência gastronômica inesquecível</p>
         </div>
-
+        
         <div class="services-grid">
-            <div class="service-card">
-                <div class="service-icon">🍽️</div>
-                <div class="service-content">
-                    <h3 class="service-title">Refeições no Local</h3>
-                    <p class="service-description">
-                        Desfrute de nossas deliciosas refeições em nosso ambiente acolhedor e familiar, perfeito para encontros com amigos e família.
-                    </p>
-                    <ul class="service-features">
-                        <li>Ambiente climatizado e confortável</li>
-                        <li>Atendimento personalizado</li>
-                        <li>Horário flexível (7h às 22h)</li>
-                        <li>Estacionamento disponível</li>
-                    </ul>
-                </div>
-            </div>
-
             <div class="service-card">
                 <div class="service-icon">📱</div>
                 <div class="service-content">
+                    <h3 class="service-title">Cardápio Digital</h3>
+                    <p class="service-description">
+                        Acesse nosso cardápio completo através do seu dispositivo móvel. 
+                        Visualize fotos dos pratos, preços e faça pedidos de forma rápida e prática.
+                    </p>
+                    <ul class="service-features">
+                        <li>Navegação intuitiva</li>
+                        <li>Fotos dos pratos</li>
+                        <li>Preços atualizados</li>
+                        <li>Pedidos online</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="service-card">
+                <div class="service-icon">⚡</div>
+                <div class="service-content">
                     <h3 class="service-title">Pedidos Online</h3>
                     <p class="service-description">
-                        Faça seus pedidos através do nosso cardápio digital, com opção de pagamento no local ou delivery.
+                        Faça seus pedidos diretamente pela internet. Escolha sua mesa, 
+                        selecione os pratos e acompanhe o status do seu pedido em tempo real.
                     </p>
                     <ul class="service-features">
-                        <li>Cardápio digital interativo</li>
-                        <li>Pedidos em tempo real</li>
-                        <li>Múltiplas formas de pagamento</li>
-                        <li>Acompanhamento do status do pedido</li>
+                        <li>Pedidos instantâneos</li>
+                        <li>Acompanhamento em tempo real</li>
+                        <li>Escolha de mesa</li>
+                        <li>Histórico de pedidos</li>
                     </ul>
                 </div>
             </div>
-
+            
             <div class="service-card">
-                <div class="service-icon">🎉</div>
+                <div class="service-icon">👨‍🍳</div>
                 <div class="service-content">
-                    <h3 class="service-title">Eventos e Festas</h3>
+                    <h3 class="service-title">Atendimento Personalizado</h3>
                     <p class="service-description">
-                        Organizamos eventos especiais, festas de aniversário, casamentos e reuniões corporativas com menus personalizados.
+                        Nossa equipe está sempre pronta para atender você com cordialidade 
+                        e eficiência, garantindo uma experiência gastronômica excepcional.
                     </p>
                     <ul class="service-features">
-                        <li>Decoração personalizada</li>
-                        <li>Menu sob medida</li>
-                        <li>Serviço completo de buffet</li>
-                        <li>Coordenador de eventos</li>
+                        <li>Equipe treinada</li>
+                        <li>Atendimento rápido</li>
+                        <li>Recomendações personalizadas</li>
+                        <li>Suporte especializado</li>
                     </ul>
                 </div>
             </div>
-
+            
             <div class="service-card">
-                <div class="service-icon">🚚</div>
+                <div class="service-icon">🏠</div>
                 <div class="service-content">
-                    <h3 class="service-title">Delivery</h3>
+                    <h3 class="service-title">Ambiente Acolhedor</h3>
                     <p class="service-description">
-                        Entregamos nossos pratos em toda a região de Gurúè, mantendo a qualidade e temperatura dos alimentos.
+                        Desfrute de um ambiente confortável e familiar, perfeito para 
+                        refeições com amigos e família.
                     </p>
                     <ul class="service-features">
-                        <li>Entrega rápida e segura</li>
-                        <li>Embalagem especial para viagem</li>
-                        <li>Rastreamento da entrega</li>
-                        <li>Pedido mínimo flexível</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="service-card">
-                <div class="service-icon">👥</div>
-                <div class="service-content">
-                    <h3 class="service-title">Reservas</h3>
-                    <p class="service-description">
-                        Garanta seu lugar em nosso restaurante com reservas antecipadas para grupos e ocasiões especiais.
-                    </p>
-                    <ul class="service-features">
-                        <li>Reservas online e telefônicas</li>
-                        <li>Mesas para grupos grandes</li>
-                        <li>Confirmação automática</li>
-                        <li>Flexibilidade de horários</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="service-card">
-                <div class="service-icon">🎁</div>
-                <div class="service-content">
-                    <h3 class="service-title">Vale-Presente</h3>
-                    <p class="service-description">
-                        Presenteie seus amigos e familiares com vales-presente do Vuchada, uma experiência gastronômica única.
-                    </p>
-                    <ul class="service-features">
-                        <li>Valores personalizados</li>
-                        <li>Embalagem elegante</li>
-                        <li>Validade estendida</li>
-                        <li>Válido para todos os serviços</li>
+                        <li>Ambiente climatizado</li>
+                        <li>Música ambiente</li>
+                        <li>Decoração moderna</li>
+                        <li>Conforto garantido</li>
                     </ul>
                 </div>
             </div>
         </div>
-
+        
         <div class="menu-section">
-            <h2 class="section-title">Nossos Menus</h2>
+            <h2 class="section-title">Nossas Especialidades</h2>
             <div class="menu-categories">
                 <div class="menu-category">
-                    <h3>🍳 Café da Manhã</h3>
-                    <p>Pães frescos, ovos, frutas tropicais, café moçambicano e sucos naturais para começar o dia com energia.</p>
+                    <h3>Pratos Principais</h3>
+                    <p>Uma variedade de pratos tradicionais e contemporâneos, preparados com ingredientes frescos e técnicas culinárias modernas.</p>
                 </div>
-
                 <div class="menu-category">
-                    <h3>🍽️ Almoço</h3>
-                    <p>Pratos tradicionais moçambicanos como Matapa, Caril de Camarão, Frango à Zambeziana e muito mais.</p>
+                    <h3>Sobremesas</h3>
+                    <p>Deliciosas sobremesas artesanais, perfeitas para finalizar sua refeição com um toque especial.</p>
                 </div>
-
                 <div class="menu-category">
-                    <h3>🌙 Jantar</h3>
-                    <p>Especialidades da casa, pratos executivos e opções vegetarianas para um jantar memorável.</p>
-                </div>
-
-                <div class="menu-category">
-                    <h3>🍰 Sobremesas</h3>
-                    <p>Sobremesas tradicionais e contemporâneas, incluindo doces moçambicanos e sorvetes artesanais.</p>
-                </div>
-
-                <div class="menu-category">
-                    <h3>🥤 Bebidas</h3>
-                    <p>Refrigerantes, sucos naturais, cervejas locais e internacionais, e coquetéis especiais.</p>
-                </div>
-
-                <div class="menu-category">
-                    <h3>🍷 Vinhos</h3>
-                    <p>Seleção de vinhos nacionais e importados para harmonizar perfeitamente com nossos pratos.</p>
+                    <h3>Bebidas</h3>
+                    <p>Refrigerantes, sucos naturais, cafés especiais e uma seleção de vinhos para acompanhar sua refeição.</p>
                 </div>
             </div>
         </div>
-
+        
         <div class="special-offers">
             <h2 class="offers-title">Ofertas Especiais</h2>
             <ul class="offers-list">
-                <li>🎉 <strong>Segunda-feira:</strong> 20% de desconto em todos os pratos principais</li>
-                <li>👥 <strong>Terça-feira:</strong> Menu executivo com preço especial para grupos</li>
-                <li>🍰 <strong>Quarta-feira:</strong> Sobremesa grátis com qualquer prato principal</li>
-                <li>🍷 <strong>Quinta-feira:</strong> Happy Hour com 50% de desconto em bebidas</li>
-                <li>👨‍👩‍👧‍👦 <strong>Fim de semana:</strong> Menu familiar com preços especiais</li>
-                <li>🎂 <strong>Aniversariantes:</strong> Prato principal grátis no mês do aniversário</li>
+                <li>🎉 Happy Hour: 50% de desconto em bebidas (17h às 19h)</li>
+                <li>👨‍👩‍👧‍👦 Menu Família: Desconto especial para grupos</li>
+                <li>🎂 Aniversariantes: Sobremesa grátis no dia do aniversário</li>
+                <li>💳 Cartão Fidelidade: Acumule pontos e ganhe descontos</li>
             </ul>
         </div>
-
+        
         <div class="contact-section">
-            <h3 class="contact-title">Entre em Contato</h3>
-            <p class="contact-info">
-                <strong>Telefone:</strong> <a href="tel:+258XXXXXXXX">+258 XX XXX XXX</a><br>
-                <strong>WhatsApp:</strong> <a href="https://wa.me/258XXXXXXXX">+258 XX XXX XXX</a><br>
-                <strong>Email:</strong> <a href="mailto:info@vuchada.co.mz">info@vuchada.co.mz</a><br>
-                <strong>Endereço:</strong> Gurúè, Província da Zambézia, Moçambique<br>
-                <strong>Horário:</strong> Segunda a Domingo, das 7h às 22h
-            </p>
+            <h2 class="contact-title">Entre em Contato</h2>
+            <div class="contact-info">
+                <p>📞 <a href="tel:+258123456789">(258) 123-456-789</a></p>
+                <p>📧 <a href="mailto:info@vuchada.com">info@vuchada.com</a></p>
+                <p>📍 Rua Principal, Cidade, Moçambique</p>
+                <p>🕒 Segunda a Domingo: 11h às 22h</p>
+            </div>
         </div>
     </div>
 
     <script>
-        // Adicionar efeito de scroll suave
-        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
-                });
+        // Mobile menu functionality
+        const hamburger = document.getElementById('hamburger');
+        const mobileMenu = document.getElementById('mobileMenu');
+
+        hamburger.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            hamburger.classList.toggle('active');
+            mobileMenu.classList.toggle('active');
+        });
+
+        // Close mobile menu when clicking on a link
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                hamburger.classList.remove('active');
+                mobileMenu.classList.remove('active');
             });
         });
 
-        // Adicionar animação aos cards quando aparecem na tela
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        // Observar todos os cards de serviço
-        document.querySelectorAll('.service-card').forEach(card => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-            observer.observe(card);
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!hamburger.contains(e.target) && !mobileMenu.contains(e.target)) {
+                hamburger.classList.remove('active');
+                mobileMenu.classList.remove('active');
+            }
         });
     </script>
 </body>
