@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vuchada - Gerenciar Pedidos</title>
+    <script src="./config.js"></script>
     <style>
         * {
             margin: 0;
@@ -921,7 +922,7 @@
         async function loadOrders() {
             try {
                 const statusFilter = document.getElementById('statusFilter').value;
-                let url = '/api/pedidos';
+                let url = API_CONFIG.getUrl('/api/pedidos');
                 
                 if (statusFilter) {
                     url += `?status=${statusFilter}`;
