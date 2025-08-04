@@ -291,6 +291,18 @@
         }
 
         @media (max-width: 768px) {
+            .nav-buttons {
+                display: none;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .mobile-menu {
+                display: block;
+            }
+
             .hero-title {
                 font-size: 2rem;
             }
@@ -317,6 +329,12 @@
 
             .hero-section {
                 padding: 2rem 1rem;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-menu {
+                display: none !important;
             }
         }
 
@@ -419,8 +437,8 @@
             <h3 class="location-title">Nossa Localização</h3>
             <p class="location-details">
                 <strong>Endereço:</strong> Gurúè, Província da Zambézia, Moçambique<br>
-                <strong>Telefone:</strong> +258 XX XXX XXX<br>
-                <strong>Email:</strong> info@vuchada.co.mz
+                <strong>WhatsApp:</strong> <a href="https://wa.me/258866036384" style="color: #FF8C00; text-decoration: none;">+258 866 036 384</a><br>
+                <strong>Email:</strong> <a href="mailto:vuchada@gmail.com" style="color: #FF8C00; text-decoration: none;">vuchada@gmail.com</a>
             </p>
         </div>
     </div>
