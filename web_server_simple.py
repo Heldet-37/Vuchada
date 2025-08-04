@@ -226,14 +226,20 @@ def get_user_info():
 @app.route('/api/pedidos')
 def get_pedidos():
     print(f"🔍 Verificando pedidos - Session user_id: {session.get('user_id')}")
+    print(f"🔍 Session completa: {dict(session)}")
     
     if 'user_id' not in session:
         print("❌ Usuário não logado")
-        return jsonify([])
+        return jsonify({'error': 'Usuário não logado'}), 401
     
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
+        
+        # Verificar se existem pedidos na tabela
+        cursor.execute('SELECT COUNT(*) as total FROM orders')
+        total_orders = cursor.fetchone()['total']
+        print(f"📊 Total de pedidos na tabela: {total_orders}")
         
         cursor.execute('''
             SELECT o.id, o.status, o.total_amount, o.created_at,
@@ -268,7 +274,95 @@ def get_pedidos():
         
     except Exception as e:
         print(f"❌ Erro ao buscar pedidos: {e}")
-        return jsonify([])
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/pedido/<int:order_id>/itens')
+def get_pedido_itens(order_id):
+    print(f"🔍 Buscando itens do pedido {order_id}")
+    
+    if 'user_id' not in session:
+        print("❌ Usuário não logado")
+        return jsonify({'error': 'Usuário não logado'}), 401
+    
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute('''
+            SELECT oi.quantity, oi.unit_price, p.name, p.description
+            FROM order_items oi
+            JOIN products p ON oi.product_id = p.id
+            WHERE oi.order_id = ?
+        ''', (order_id,))
+        
+        itens = []
+        rows = cursor.fetchall()
+        print(f"📊 Encontrados {len(rows)} itens para o pedido {order_id}")
+        
+        for row in rows:
+            item = {
+                'name': row['name'],
+                'description': row['description'] or '',
+                'quantity': row['quantity'],
+                'unit_price': row['unit_price'],
+                'unit_price_formatted': format_metical(row['unit_price']),
+                'total': row['quantity'] * row['unit_price'],
+                'total_formatted': format_metical(row['quantity'] * row['unit_price'])
+            }
+            itens.append(item)
+            print(f"📋 Item: {row['name']} x{row['quantity']}")
+        
+        conn.close()
+        print(f"✅ Retornando {len(itens)} itens")
+        return jsonify(itens)
+        
+    except Exception as e:
+        print(f"❌ Erro ao buscar itens do pedido: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/pedido/<int:order_id>/status', methods=['PUT'])
+def update_pedido_status(order_id):
+    print(f"🔄 Alterando status do pedido {order_id}")
+    
+    if 'user_id' not in session:
+        print("❌ Usuário não logado")
+        return jsonify({'success': False, 'message': 'Usuário não logado'}), 401
+    
+    try:
+        data = request.get_json()
+        new_status = data.get('status')
+        
+        if not new_status:
+            return jsonify({'success': False, 'message': 'Status não fornecido'}), 400
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Verificar se o pedido existe
+        cursor.execute('SELECT id FROM orders WHERE id = ?', (order_id,))
+        order = cursor.fetchone()
+        
+        if not order:
+            conn.close()
+            return jsonify({'success': False, 'message': 'Pedido não encontrado'}), 404
+        
+        # Atualizar status
+        cursor.execute('UPDATE orders SET status = ? WHERE id = ?', (new_status, order_id))
+        conn.commit()
+        conn.close()
+        
+        print(f"✅ Status do pedido {order_id} alterado para: {new_status}")
+        return jsonify({'success': True, 'message': f'Status alterado para {new_status}'})
+        
+    except Exception as e:
+        print(f"❌ Erro ao alterar status do pedido: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

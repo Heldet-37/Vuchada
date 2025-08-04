@@ -928,19 +928,34 @@
                     url += `?status=${statusFilter}`;
                 }
                 
+                console.log('🔍 Carregando pedidos de:', url);
                 const response = await fetch(url);
+                console.log('📡 Response status:', response.status);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
                 orders = await response.json();
+                console.log('📊 Pedidos recebidos:', orders);
                 renderOrders();
             } catch (error) {
-                console.error('Erro ao carregar pedidos:', error);
+                console.error('❌ Erro ao carregar pedidos:', error);
                 document.getElementById('ordersGrid').innerHTML = 
-                    '<div class="loading">Erro ao carregar pedidos</div>';
+                    '<div class="loading">Erro ao carregar pedidos: ' + error.message + '</div>';
             }
         }
 
         // Renderizar pedidos
         function renderOrders() {
             const container = document.getElementById('ordersGrid');
+            console.log('🎨 Renderizando pedidos:', orders);
+            
+            if (!Array.isArray(orders)) {
+                console.error('❌ Orders não é um array:', orders);
+                container.innerHTML = '<div class="no-orders">Erro: dados inválidos</div>';
+                return;
+            }
             
             if (orders.length === 0) {
                 container.innerHTML = '<div class="no-orders">Nenhum pedido encontrado</div>';
@@ -1391,7 +1406,7 @@
             try {
                 const response = await fetch(API_CONFIG.getUrl('/api/user-info'));
                 const userInfo = await response.json();
-                if (userInfo.success) {
+                if (userInfo.logged_in) {
                     document.getElementById('userName').textContent = userInfo.name;
                 }
             } catch (error) {
