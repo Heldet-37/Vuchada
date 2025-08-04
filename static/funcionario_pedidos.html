@@ -1047,7 +1047,7 @@
             if (!currentOrderId) return;
             
             try {
-                const response = await fetch(`/api/pedido/${currentOrderId}/status`, {
+                const response = await fetch(API_CONFIG.getUrl(`/api/pedido/${currentOrderId}/status`), {
                     method: 'PUT',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1153,7 +1153,7 @@
             }
             
             try {
-                const response = await fetch(`/api/pedido/${currentPaymentOrder.id}/pagar`, {
+                const response = await fetch(API_CONFIG.getUrl(`/api/pedido/${currentPaymentOrder.id}/pagar`), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1250,7 +1250,7 @@
             }
             
             try {
-                const response = await fetch(`/api/pedido/${currentSaleOrder.id}/finalizar-venda`, {
+                const response = await fetch(API_CONFIG.getUrl(`/api/pedido/${currentSaleOrder.id}/finalizar-venda`), {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1280,7 +1280,7 @@
         // Mostrar detalhes do pedido
         async function showDetails(orderId) {
             try {
-                const response = await fetch(`/api/pedido/${orderId}/itens`);
+                const response = await fetch(API_CONFIG.getUrl(`/api/pedido/${orderId}/itens`));
                 const items = await response.json();
                 
                 const order = orders.find(o => o.id === orderId);
@@ -1389,7 +1389,7 @@
         // Carregar informações do usuário
         async function loadUserInfo() {
             try {
-                const response = await fetch('/api/user-info');
+                const response = await fetch(API_CONFIG.getUrl('/api/user-info'));
                 const userInfo = await response.json();
                 if (userInfo.success) {
                     document.getElementById('userName').textContent = userInfo.name;

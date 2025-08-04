@@ -26,6 +26,8 @@ def main(page: ft.Page):
     page.window_full_screen = True
     page.window_resizable = False
     page.window_maximizable = False
+    page.theme_mode = ft.ThemeMode.LIGHT
+    page.bgcolor = ft.colors.WHITE
 
     user_session = {'user': None}
 
