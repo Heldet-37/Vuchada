@@ -40,6 +40,18 @@ def cliente():
 def funcionario():
     return send_from_directory('static', 'funcionario.html')
 
+@app.route('/funcionario/pedidos')
+def funcionario_pedidos():
+    return send_from_directory('static', 'funcionario_pedidos.html')
+
+@app.route('/servicos')
+def servicos():
+    return send_from_directory('static', 'servicos.html')
+
+@app.route('/sobre')
+def sobre():
+    return send_from_directory('static', 'sobre.html')
+
 @app.route('/api')
 def api_info():
     return jsonify({
