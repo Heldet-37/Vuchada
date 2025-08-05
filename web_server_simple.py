@@ -32,6 +32,27 @@ def format_metical(value):
 def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
+# Rotas para arquivos estáticos
+@app.route('/styles.css')
+def styles():
+    return send_from_directory('static', 'styles.css')
+
+@app.route('/config.js')
+def config_js():
+    return send_from_directory('static', 'config.js')
+
+@app.route('/cliente.js')
+def cliente_js():
+    return send_from_directory('static', 'cliente.js')
+
+@app.route('/cliente-fixes.css')
+def cliente_fixes_css():
+    return send_from_directory('static', 'cliente-fixes.css')
+
+@app.route('/images/<path:filename>')
+def images(filename):
+    return send_from_directory('static/images', filename)
+
 @app.route('/')
 def index():
     return send_from_directory('static', 'index.html')
@@ -257,10 +278,10 @@ def fazer_pedido():
                     ''', (quantity, variation_id))
             else:
                 # Buscar preço do produto
-            cursor.execute('SELECT price FROM products WHERE id = ?', (product_id,))
-            product = cursor.fetchone()
-            if product:
-                unit_price = product['price']
+                cursor.execute('SELECT price FROM products WHERE id = ?', (product_id,))
+                product = cursor.fetchone()
+                if product:
+                    unit_price = product['price']
                     # Atualizar estoque do produto
                     cursor.execute('''
                         UPDATE products 

@@ -32,6 +32,7 @@ function renderCategories() {
 // Selecionar categoria
 function selectCategory(categoryId) {
     selectedCategory = categoryId;
+    console.log('[DEBUG] Categoria selecionada:', categoryId);
     renderCategories();
     loadProducts();
 }
@@ -53,6 +54,7 @@ async function loadProducts() {
         if (params.toString()) {
             url += '?' + params.toString();
         }
+        console.log('[DEBUG] Carregando produtos da categoria:', selectedCategory, 'URL:', url);
         
         const response = await fetch(url);
         products = await response.json();
@@ -310,12 +312,16 @@ function openCart() {
     }
     
     loadMesas();
-    document.getElementById('cartModal').style.display = 'block';
+    const modal = document.getElementById('cartModal');
+    modal.style.display = 'flex';
+    modal.classList.add('show');
 }
 
 // Fechar carrinho
 function closeCart() {
-    document.getElementById('cartModal').style.display = 'none';
+    const modal = document.getElementById('cartModal');
+    modal.style.display = 'none';
+    modal.classList.remove('show');
 }
 
 // Carregar mesas

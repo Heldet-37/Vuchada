@@ -46,6 +46,22 @@ def hash_password(password):
     return hashlib.sha256(password.encode()).hexdigest()
 
 # Rotas de páginas estáticas
+@app.route('/styles.css')
+def styles():
+    return send_from_directory('static', 'styles.css')
+
+@app.route('/config.js')
+def config_js():
+    return send_from_directory('static', 'config.js')
+
+@app.route('/cliente.js')
+def cliente_js():
+    return send_from_directory('static', 'cliente.js')
+
+@app.route('/images/<path:filename>')
+def images(filename):
+    return send_from_directory('static/images', filename)
+
 @app.route('/')
 def index():
     return send_from_directory('static', 'index.html')
