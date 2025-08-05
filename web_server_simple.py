@@ -7,8 +7,11 @@ import os
 from database.db import init_db
 
 app = Flask(__name__, static_folder='static')
-CORS(app)  # Permitir CORS para todas as origens
+CORS(app, supports_credentials=True)  # Permitir CORS com credenciais
 app.secret_key = 'pdv_restaurant_secret_key_2024'
+app.config['SESSION_COOKIE_SECURE'] = False  # Para desenvolvimento
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 # Inicializar banco de dados
 try:
@@ -62,6 +65,7 @@ def api_info():
             '/api/categorias',
             '/api/produtos',
             '/api/mesas',
+            '/api/pedidos',
             '/test'
         ]
     })
@@ -98,20 +102,22 @@ def test():
                 'total_orders': total_orders,
                 'total_users': total_users,
                 'total_products': total_products
+            },
+            'session_info': {
+                'user_id': session.get('user_id'),
+                'session_data': dict(session)
             }
         })
+        
     except Exception as e:
-        return jsonify({
-            'status': 'error',
-            'message': f'Erro no banco: {str(e)}'
-        }), 500
+        return jsonify({'status': 'error', 'message': str(e)})
 
 @app.route('/api/categorias')
 def get_categorias():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute('SELECT id, name FROM categories ORDER BY name')
+        cursor.execute('SELECT id, name FROM categories WHERE is_active = 1 ORDER BY name')
         categorias = [{'id': row['id'], 'name': row['name']} for row in cursor.fetchall()]
         conn.close()
         return jsonify(categorias)
@@ -120,24 +126,68 @@ def get_categorias():
 
 @app.route('/api/produtos')
 def get_produtos():
+    categoria_id = request.args.get('categoria_id')
+    busca = request.args.get('busca', '')
+    
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute('SELECT id, name, description, price, stock, image_url FROM products WHERE stock > 0')
-        produtos = []
-        for row in cursor.fetchall():
-            produtos.append({
-                'id': row['id'],
-                'name': row['name'],
-                'description': row['description'] or '',
-                'price': row['price'],
-                'price_formatted': format_metical(row['price']),
-                'stock': row['stock'],
-                'image_url': row['image_url'] or '',
-                'has_variations': False
+        
+        if categoria_id and categoria_id != 'todos':
+            cursor.execute('''
+                SELECT id, name, description, price, image_url, stock, has_variations
+                FROM products 
+                WHERE category_id = ? AND is_active = 1 AND stock > 0
+                ORDER BY name
+            ''', (categoria_id,))
+        else:
+            cursor.execute('''
+                SELECT id, name, description, price, image_url, stock, has_variations
+                FROM products 
+                WHERE is_active = 1 AND stock > 0
+                ORDER BY name
+            ''')
+        
+        produtos = cursor.fetchall()
+        
+        # Filtrar por busca
+        if busca:
+            produtos = [p for p in produtos if busca.lower() in p['name'].lower()]
+        
+        produtos_json = []
+        for produto in produtos:
+            # Se o produto tem variações, buscar as variações
+            variations = []
+            if produto['has_variations']:
+                cursor.execute('''
+                    SELECT id, variation_name, price, stock
+                    FROM product_variations 
+                    WHERE product_id = ? AND is_active = 1 AND stock > 0
+                    ORDER BY variation_name
+                ''', (produto['id'],))
+                variations = cursor.fetchall()
+            
+            produtos_json.append({
+                'id': produto['id'],
+                'name': produto['name'],
+                'description': produto['description'] or 'Sem descrição',
+                'price': produto['price'],
+                'price_formatted': format_metical(produto['price']),
+                'image_url': produto['image_url'] or '/static/default_product.png',
+                'stock': produto['stock'],
+                'has_variations': produto['has_variations'],
+                'variations': [{
+                    'id': v['id'],
+                    'name': v['variation_name'],
+                    'price': v['price'],
+                    'price_formatted': format_metical(v['price']),
+                    'stock': v['stock']
+                } for v in variations]
             })
+        
         conn.close()
-        return jsonify(produtos)
+        return jsonify(produtos_json)
+        
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -146,12 +196,17 @@ def get_mesas():
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute('SELECT id, number, capacity, status FROM tables ORDER BY number')
+        cursor.execute('''
+            SELECT id, number, capacity, status
+            FROM tables 
+            ORDER BY number
+        ''')
         mesas = []
         for row in cursor.fetchall():
             mesas.append({
                 'id': row['id'],
                 'name': f"Mesa {row['number']}",
+                'number': row['number'],
                 'capacity': row['capacity'],
                 'status': row['status']
             })
@@ -167,32 +222,74 @@ def fazer_pedido():
         mesa_id = data.get('mesa_id')
         itens = data.get('itens', [])
         
+        if not mesa_id or not itens:
+            return jsonify({'success': False, 'message': 'Dados inválidos'})
+        
         conn = get_db_connection()
         cursor = conn.cursor()
         
-        cursor.execute('INSERT INTO orders (table_id, status) VALUES (?, "pendente")', (mesa_id,))
+        # Criar pedido
+        cursor.execute('''
+            INSERT INTO orders (table_id, status, total_amount, created_at)
+            VALUES (?, 'pendente', 0, ?)
+        ''', (mesa_id, datetime.now()))
+        
         order_id = cursor.lastrowid
         total = 0
         
+        # Adicionar itens
         for item in itens:
             product_id = item.get('product_id')
             quantity = item.get('quantity', 1)
+            variation_id = item.get('variation_id')
             
+            if variation_id:
+                # Buscar preço da variação
+                cursor.execute('SELECT price FROM product_variations WHERE id = ?', (variation_id,))
+                variation = cursor.fetchone()
+                if variation:
+                    unit_price = variation['price']
+                    # Atualizar estoque da variação
+                    cursor.execute('''
+                        UPDATE product_variations 
+                        SET stock = stock - ? 
+                        WHERE id = ?
+                    ''', (quantity, variation_id))
+            else:
+                # Buscar preço do produto
             cursor.execute('SELECT price FROM products WHERE id = ?', (product_id,))
             product = cursor.fetchone()
             if product:
                 unit_price = product['price']
-                item_total = unit_price * quantity
-                total += item_total
-                
-                cursor.execute('INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES (?, ?, ?, ?)', 
-                             (order_id, product_id, quantity, unit_price))
+                    # Atualizar estoque do produto
+                    cursor.execute('''
+                        UPDATE products 
+                        SET stock = stock - ? 
+                        WHERE id = ?
+                    ''', (quantity, product_id))
+            
+            # Adicionar item ao pedido
+            cursor.execute('''
+                INSERT INTO order_items (order_id, product_id, quantity, unit_price)
+                VALUES (?, ?, ?, ?)
+            ''', (order_id, product_id, quantity, unit_price))
+            
+            total += quantity * unit_price
         
+        # Atualizar total do pedido
         cursor.execute('UPDATE orders SET total_amount = ? WHERE id = ?', (total, order_id))
+        
+        # Atualizar status da mesa
+        cursor.execute('UPDATE tables SET status = ? WHERE id = ?', ('ocupada', mesa_id))
+        
         conn.commit()
         conn.close()
         
-        return jsonify({'success': True, 'order_id': order_id, 'total': format_metical(total)})
+        return jsonify({
+            'success': True,
+            'order_id': order_id,
+            'total': format_metical(total)
+        })
         
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)})
@@ -209,13 +306,17 @@ def login():
         conn = get_db_connection()
         cursor = conn.cursor()
         hashed_password = hash_password(password)
-        cursor.execute('SELECT * FROM users WHERE username = ? AND password = ?', (username, hashed_password))
+        cursor.execute('SELECT * FROM users WHERE username = ? AND password = ? AND active = 1', (username, hashed_password))
         user = cursor.fetchone()
         conn.close()
         
         if user:
             session['user_id'] = user['id']
+            session['username'] = user['username']
+            session['user_name'] = user['name']
+            session['user_role'] = user['role']
             print(f"✅ Login bem-sucedido: {user['name']} (ID: {user['id']})")
+            print(f"📋 Session data: {dict(session)}")
             return jsonify({'success': True, 'redirect': '/funcionario/pedidos'})
         else:
             print(f"❌ Login falhou para: {username}")
@@ -271,7 +372,7 @@ def get_pedidos():
     
     if 'user_id' not in session:
         print("❌ Usuário não logado")
-        return jsonify({'error': 'Usuário não logado'}), 401
+        return jsonify({'error': 'Usuário não logado', 'debug': 'No user_id in session'}), 401
     
     try:
         conn = get_db_connection()
@@ -282,10 +383,14 @@ def get_pedidos():
         total_orders = cursor.fetchone()['total']
         print(f"📊 Total de pedidos na tabela: {total_orders}")
         
+        # Buscar pedidos com informações completas
         cursor.execute('''
-            SELECT o.id, o.status, o.total_amount, o.created_at,
+            SELECT o.id, o.status, o.total_amount, o.created_at, o.notes,
                    t.number as table_number, t.capacity,
-                   'Mesa ' || t.number as table_name
+                   CASE 
+                       WHEN t.number IS NOT NULL THEN 'Mesa ' || t.number
+                       ELSE 'Balcão'
+                   END as table_name
             FROM orders o
             LEFT JOIN tables t ON o.table_id = t.id
             ORDER BY o.created_at DESC
@@ -299,15 +404,16 @@ def get_pedidos():
             pedido = {
                 'id': row['id'],
                 'status': row['status'],
-                'total': row['total_amount'],
-                'total_formatted': format_metical(row['total_amount']),
+                'total': row['total_amount'] or 0,
+                'total_formatted': format_metical(row['total_amount'] or 0),
                 'created_at': row['created_at'],
                 'table_name': row['table_name'],
                 'table_number': row['table_number'],
-                'capacity': row['capacity']
+                'capacity': row['capacity'],
+                'observations': row['notes'] or ''
             }
             pedidos.append(pedido)
-            print(f"📋 Pedido {row['id']}: Mesa {row['table_name']}, Status: {row['status']}")
+            print(f"📋 Pedido {row['id']}: {row['table_name']}, Status: {row['status']}, Total: {row['total_amount']}")
         
         conn.close()
         print(f"✅ Retornando {len(pedidos)} pedidos")
@@ -367,7 +473,7 @@ def get_pedido_itens(order_id):
 
 @app.route('/api/pedido/<int:order_id>/status', methods=['PUT'])
 def update_pedido_status(order_id):
-    print(f"🔄 Alterando status do pedido {order_id}")
+    print(f"🔄 Atualizando status do pedido {order_id}")
     
     if 'user_id' not in session:
         print("❌ Usuário não logado")
@@ -375,37 +481,142 @@ def update_pedido_status(order_id):
     
     try:
         data = request.get_json()
-        new_status = data.get('status')
+        novo_status = data.get('status')
         
-        if not new_status:
-            return jsonify({'success': False, 'message': 'Status não fornecido'}), 400
+        if not novo_status:
+            return jsonify({'success': False, 'message': 'Status é obrigatório'})
         
         conn = get_db_connection()
         cursor = conn.cursor()
         
         # Verificar se o pedido existe
-        cursor.execute('SELECT id FROM orders WHERE id = ?', (order_id,))
-        order = cursor.fetchone()
+        cursor.execute('SELECT id, table_id FROM orders WHERE id = ?', (order_id,))
+        pedido = cursor.fetchone()
         
-        if not order:
+        if not pedido:
             conn.close()
-            return jsonify({'success': False, 'message': 'Pedido não encontrado'}), 404
+            return jsonify({'success': False, 'message': 'Pedido não encontrado'})
         
         # Atualizar status
-        cursor.execute('UPDATE orders SET status = ? WHERE id = ?', (new_status, order_id))
+        cursor.execute('UPDATE orders SET status = ? WHERE id = ?', (novo_status, order_id))
+        
+        # Se o pedido foi finalizado, liberar a mesa
+        if novo_status in ['entregue', 'cancelado']:
+            if pedido['table_id']:
+                cursor.execute('UPDATE tables SET status = ? WHERE id = ?', ('livre', pedido['table_id']))
+        
         conn.commit()
         conn.close()
         
-        print(f"✅ Status do pedido {order_id} alterado para: {new_status}")
-        return jsonify({'success': True, 'message': f'Status alterado para {new_status}'})
+        print(f"✅ Status do pedido {order_id} atualizado para: {novo_status}")
+        return jsonify({'success': True, 'message': f'Status atualizado para: {novo_status}'})
         
     except Exception as e:
-        print(f"❌ Erro ao alterar status do pedido: {e}")
-        import traceback
-        traceback.print_exc()
-        return jsonify({'success': False, 'message': str(e)}), 500
+        print(f"❌ Erro ao atualizar status: {e}")
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/pedido/<int:order_id>/pagar', methods=['POST'])
+def process_payment(order_id):
+    print(f"💳 Processando pagamento do pedido {order_id}")
+    
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Usuário não logado'}), 401
+    
+    try:
+        data = request.get_json()
+        payment_method = data.get('payment_method')
+        amount_paid = data.get('amount_paid', 0)
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Buscar pedido
+        cursor.execute('SELECT id, total_amount, table_id FROM orders WHERE id = ?', (order_id,))
+        pedido = cursor.fetchone()
+        
+        if not pedido:
+            conn.close()
+            return jsonify({'success': False, 'message': 'Pedido não encontrado'})
+        
+        # Registrar venda
+        cursor.execute('''
+            INSERT INTO sales (order_id, user_id, payment_method, total_amount, created_at)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (order_id, session['user_id'], payment_method, pedido['total_amount'], datetime.now()))
+        
+        # Atualizar status do pedido
+        cursor.execute('UPDATE orders SET status = ? WHERE id = ?', ('entregue', order_id))
+        
+        # Liberar mesa
+        if pedido['table_id']:
+            cursor.execute('UPDATE tables SET status = ? WHERE id = ?', ('livre', pedido['table_id']))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Pagamento processado com sucesso!',
+            'change': amount_paid - pedido['total_amount'] if amount_paid > pedido['total_amount'] else 0
+        })
+        
+    except Exception as e:
+        print(f"❌ Erro ao processar pagamento: {e}")
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/api/pedido/<int:order_id>/finalizar-venda', methods=['POST'])
+def finalize_sale(order_id):
+    print(f"💰 Finalizando venda do pedido {order_id}")
+    
+    if 'user_id' not in session:
+        return jsonify({'success': False, 'message': 'Usuário não logado'}), 401
+    
+    try:
+        data = request.get_json()
+        payment_method = data.get('payment_method')
+        amount_paid = data.get('amount_paid', 0)
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        
+        # Buscar pedido
+        cursor.execute('SELECT id, total_amount, table_id FROM orders WHERE id = ?', (order_id,))
+        pedido = cursor.fetchone()
+        
+        if not pedido:
+            conn.close()
+            return jsonify({'success': False, 'message': 'Pedido não encontrado'})
+        
+        # Registrar venda
+        cursor.execute('''
+            INSERT INTO sales (order_id, user_id, payment_method, total_amount, created_at)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (order_id, session['user_id'], payment_method, pedido['total_amount'], datetime.now()))
+        
+        # Atualizar status do pedido
+        cursor.execute('UPDATE orders SET status = ? WHERE id = ?', ('entregue', order_id))
+        
+        # Liberar mesa
+        if pedido['table_id']:
+            cursor.execute('UPDATE tables SET status = ? WHERE id = ?', ('livre', pedido['table_id']))
+        
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Venda finalizada com sucesso!',
+            'change': amount_paid - pedido['total_amount'] if amount_paid > pedido['total_amount'] else 0
+        })
+        
+    except Exception as e:
+        print(f"❌ Erro ao finalizar venda: {e}")
+        return jsonify({'success': False, 'message': str(e)})
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return jsonify({'success': True, 'message': 'Logout realizado com sucesso'})
 
 if __name__ == '__main__':
-    port = int(os.environ.get('PORT', 5000))
-    print(f"🚀 Iniciando servidor na porta {port}")
-    app.run(host='0.0.0.0', port=port, debug=False) 
+    app.run(debug=True, host='0.0.0.0', port=5000) 
